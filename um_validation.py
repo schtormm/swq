@@ -4,9 +4,9 @@ True whitelisting-based input validation for security
 """
 
 import re
-from datetime import datetime, date
-from um_utils import get_cities_list, validate_latitude, validate_longitude
+from datetime import date, datetime
 
+from um_utils import get_cities_list, validate_latitude, validate_longitude
 
 # WHITELISTING PATTERNS - Only define what IS allowed
 # Names: Only letters, spaces, apostrophes, hyphens (1-50 chars)
@@ -55,17 +55,14 @@ PASSWORD_UPPERCASE = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 PASSWORD_DIGITS = set('0123456789')
 PASSWORD_SPECIAL = set('~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 
-# Allowed values whitelists
-ALLOWED_GENDERS = {"male", "female"}
-
+# Allowed values whitelists 
+ALLOWED_GENDERS = {"male", "female"} 
 
 def is_safe_string(input_str):
-    """Check if string contains only safe characters (no null bytes)"""
     return input_str is not None and '\x00' not in str(input_str)
 
 
 def is_valid_length(input_str, min_length=None, max_length=None):
-    """Check if string length is within allowed bounds"""
     if input_str is None:
         return min_length is None or min_length == 0
     
@@ -76,7 +73,6 @@ def is_valid_length(input_str, min_length=None, max_length=None):
 
 
 def matches_whitelist_pattern(input_str, pattern):
-    """Check if input matches whitelisted pattern exactly"""
     return (input_str and 
             isinstance(input_str, str) and 
             is_safe_string(input_str) and 
@@ -84,7 +80,6 @@ def matches_whitelist_pattern(input_str, pattern):
 
 
 def validate_username(username):
-    """Validate username using true whitelisting"""
     if (username and 
         isinstance(username, str) and 
         is_safe_string(username) and 
@@ -96,7 +91,6 @@ def validate_username(username):
 
 
 def validate_password(password):
-    """Validate password using true whitelisting"""
     if (password and 
         isinstance(password, str) and 
         is_safe_string(password) and 
@@ -112,7 +106,6 @@ def validate_password(password):
 
 
 def validate_name(name, field_name="Name"):
-    """Validate names using true whitelisting"""
     if (name and 
         isinstance(name, str) and 
         is_safe_string(name) and 
@@ -124,7 +117,6 @@ def validate_name(name, field_name="Name"):
 
 
 def validate_email(email):
-    """Validate email using true whitelisting"""
     if (email and 
         isinstance(email, str) and 
         is_safe_string(email) and 
@@ -136,7 +128,6 @@ def validate_email(email):
 
 
 def validate_mobile_phone(phone):
-    """Validate mobile phone using true whitelisting"""
     if (phone and 
         isinstance(phone, str) and 
         is_safe_string(phone) and 
@@ -147,7 +138,6 @@ def validate_mobile_phone(phone):
 
 
 def validate_zip_code(zip_code):
-    """Validate Dutch zip code using true whitelisting"""
     if (zip_code and 
         isinstance(zip_code, str) and 
         is_safe_string(zip_code) and 
@@ -158,7 +148,6 @@ def validate_zip_code(zip_code):
 
 
 def validate_city(city):
-    """Validate city using true whitelisting"""
     allowed_cities = set(get_cities_list())
     if (city and 
         isinstance(city, str) and 
@@ -170,7 +159,6 @@ def validate_city(city):
 
 
 def validate_gender(gender):
-    """Validate gender using true whitelisting"""
     if (gender and 
         isinstance(gender, str) and 
         is_safe_string(gender) and 
@@ -181,7 +169,6 @@ def validate_gender(gender):
 
 
 def validate_date(date_str, field_name="Date"):
-    """Validate date using true whitelisting"""
     if (date_str and 
         isinstance(date_str, str) and 
         is_safe_string(date_str) and 
@@ -196,7 +183,6 @@ def validate_date(date_str, field_name="Date"):
 
 
 def validate_driving_license(license_num):
-    """Validate driving license using true whitelisting"""
     if (license_num and 
         isinstance(license_num, str) and 
         is_safe_string(license_num) and 
@@ -207,7 +193,6 @@ def validate_driving_license(license_num):
 
 
 def validate_scooter_serial(serial):
-    """Validate scooter serial using true whitelisting"""
     if (serial and 
         isinstance(serial, str) and 
         is_safe_string(serial) and 
@@ -218,7 +203,6 @@ def validate_scooter_serial(serial):
 
 
 def validate_positive_integer(value, field_name="Value", min_val=None, max_val=None):
-    """Validate positive integer using true whitelisting"""
     if (value and 
         isinstance(value, str) and 
         is_safe_string(value) and 
@@ -238,7 +222,6 @@ def validate_positive_integer(value, field_name="Value", min_val=None, max_val=N
 
 
 def validate_positive_float(value, field_name="Value", min_val=None, max_val=None):
-    """Validate positive float using true whitelisting"""
     if (value and 
         isinstance(value, str) and 
         is_safe_string(value) and 
@@ -258,7 +241,6 @@ def validate_positive_float(value, field_name="Value", min_val=None, max_val=Non
 
 
 def validate_percentage(value, field_name="Percentage"):
-    """Validate percentage using true whitelisting"""
     if (value and 
         isinstance(value, str) and 
         is_safe_string(value) and 
@@ -269,7 +251,6 @@ def validate_percentage(value, field_name="Percentage"):
 
 
 def validate_gps_coordinates(latitude, longitude):
-    """Validate GPS coordinates using true whitelisting"""
     lat_valid = (latitude and 
                 isinstance(latitude, str) and 
                 is_safe_string(latitude) and 
@@ -289,7 +270,6 @@ def validate_gps_coordinates(latitude, longitude):
 
 
 def validate_search_term(search_term):
-    """Validate search term using true whitelisting"""
     if (search_term and 
         isinstance(search_term, str) and 
         is_safe_string(search_term) and 
@@ -301,7 +281,6 @@ def validate_search_term(search_term):
 
 
 def get_validated_input(prompt, validation_func, *args, **kwargs):
-    """Generic function to get validated input from user"""
     while True:
         try:
             user_input = input(prompt).strip()
@@ -319,7 +298,6 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
 
 
 def validate_choice(choice, valid_choices):
-    """Validate menu choice using true whitelisting"""
     allowed_choices = set(valid_choices)
     if (choice and 
         isinstance(choice, str) and 

@@ -3,14 +3,15 @@ Urban Mobility Backend System - User Interface Module
 Console-based interface with role-specific menus and operations
 """
 
-from um_auth import current_user, logout, require_role, can_manage_role, can_access_logs
-from um_auth import can_backup_restore, can_manage_travellers, can_manage_scooters, can_add_delete_scooters
-from um_utils import print_header, print_sub_header, print_separator, create_display_table
+from um_auth import (can_access_logs, can_add_delete_scooters,
+                     can_backup_restore, can_manage_role, can_manage_scooters,
+                     can_manage_travellers, current_user, logout, require_role)
 from um_ui_operations import *
+from um_utils import (create_display_table, print_header, print_separator,
+                      print_sub_header)
 
 
 def display_main_menu():
-    """Display appropriate menu based on user role"""
     role = current_user["role"]
     
     if role == "super_admin":
@@ -25,7 +26,6 @@ def display_main_menu():
 
 
 def super_admin_menu():
-    """Super Administrator main menu"""
     while True:
         print_header("Super Administrator Menu")
         print(f"Logged in as: {current_user['username']}")
@@ -66,7 +66,6 @@ def super_admin_menu():
 
 
 def system_admin_menu():
-    """System Administrator main menu"""
     while True:
         print_header("System Administrator Menu")
         print(f"Logged in as: {current_user['username']}")
@@ -104,7 +103,6 @@ def system_admin_menu():
 
 
 def service_engineer_menu():
-    """Service Engineer main menu"""
     while True:
         print_header("Service Engineer Menu")
         print(f"Logged in as: {current_user['username']}")
@@ -133,7 +131,6 @@ def service_engineer_menu():
 
 
 def manage_users_menu(user_role):
-    """Manage users submenu"""
     role_name = "System Administrator" if user_role == "system_admin" else "Service Engineer"
     
     while True:
@@ -168,7 +165,6 @@ def manage_users_menu(user_role):
 
 
 def manage_travellers_menu():
-    """Manage travellers submenu"""
     while True:
         print_header("Manage Travellers")
         print("1. Add New Traveller")
@@ -198,7 +194,6 @@ def manage_travellers_menu():
 
 
 def manage_scooters_menu():
-    """Manage scooters submenu"""
     while True:
         print_header("Manage Scooters")
         print("1. Add New Scooter")
@@ -234,7 +229,6 @@ def manage_scooters_menu():
 
 
 def backup_restore_menu():
-    """Backup and restore submenu"""
     while True:
         print_header("Backup & Restore")
         print("1. Create Backup")
@@ -269,7 +263,6 @@ def backup_restore_menu():
 
 
 def generate_restore_codes_menu():
-    """Generate restore codes submenu (Super Admin only)"""
     if current_user["role"] != "super_admin":
         print("❌ Access denied: Only Super Administrator can generate restore codes.")
         return
@@ -300,7 +293,6 @@ def generate_restore_codes_menu():
 
 
 def view_logs_menu():
-    """View system logs submenu"""
     while True:
         print_header("System Logs")
         print("1. View Recent Logs")
@@ -324,27 +316,23 @@ def view_logs_menu():
 
 
 def update_own_password():
-    """Allow user to update their own password"""
     print_sub_header("Update Password")
     
     try:
-        from um_validation import get_validated_input, validate_password
         from um_database import update_user_password
-        
-        # Get new password with validation
+        from um_validation import get_validated_input, validate_password
+
         new_password = get_validated_input(
             "Enter new password: ",
             validate_password
         )
         
-        # Confirm password
         confirm_password = input("Confirm new password: ")
         
         if new_password != confirm_password:
             print("❌ Passwords do not match.")
             return
         
-        # Update password
         if update_user_password(current_user["username"], new_password):
             print("✅ Password updated successfully.")
         else:
@@ -357,7 +345,6 @@ def update_own_password():
 
 
 def main_menu_wrapper():
-    """Wrapper for main menu with error handling"""
     try:
         display_main_menu()
     except KeyboardInterrupt:
