@@ -55,7 +55,7 @@ PASSWORD_UPPERCASE = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 PASSWORD_DIGITS = set('0123456789')
 PASSWORD_SPECIAL = set('~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 
-# Allowed values whitelists 
+# Allowed values whitelists
 ALLOWED_GENDERS = {"male", "female"} 
 
 def is_safe_string(input_str):
