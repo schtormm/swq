@@ -8,29 +8,25 @@ import os
 import sys
 from datetime import datetime
 
-# Import our modules
-from um_auth import login, logout, current_user, initialize_hard_coded_super_admin
-from um_database import initialize_database, check_suspicious_logs_alert
+from um_auth import (current_user, initialize_hard_coded_super_admin, login,
+                     logout)
+from um_database import check_suspicious_logs_alert, initialize_database
+from um_encryption import initialize_encryption
 from um_ui import display_main_menu
 from um_utils import print_header, print_separator
-from um_encryption import initialize_encryption
 
 
 def initialize_system():
-    """Initialize the Urban Mobility backend system"""
     print_header("Urban Mobility Backend System")
     print("Initializing system...")
     
     try:
-        # Initialize encryption keys
         initialize_encryption()
         print("✓ Encryption system initialized")
         
-        # Initialize database
         initialize_database()
         print("✓ Database initialized")
-        
-        # Initialize hard-coded super administrator
+ 
         initialize_hard_coded_super_admin()
         print("✓ Super Administrator account ready")
         
@@ -53,17 +49,14 @@ def main():
     while True:
         try:
             if current_user["username"] is None:
-                # User is not logged in
                 print("\nPlease login to continue:")
                 if login():
-                    # Check for suspicious activities alert after login
                     if current_user["role"] in ["super_admin", "system_admin"]:
                         check_suspicious_logs_alert()
                     continue
                 else:
                     print("Login failed. Please try again.")
             else:
-                # User is logged in - display appropriate menu
                 display_main_menu()
                 
         except KeyboardInterrupt:

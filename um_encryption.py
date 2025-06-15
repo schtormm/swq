@@ -3,12 +3,12 @@ Urban Mobility Backend System - Encryption Module
 Symmetric encryption for sensitive data in database and logs
 """
 
-import os
 import base64
+import os
+
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
 
 # Global encryption object
 _cipher = None
@@ -20,11 +20,9 @@ def initialize_encryption():
     global _cipher
     
     if os.path.exists(KEY_FILE):
-        # Load existing key
         with open(KEY_FILE, 'rb') as key_file:
             key = key_file.read()
     else:
-        # Generate new key
         key = Fernet.generate_key()
         with open(KEY_FILE, 'wb') as key_file:
             key_file.write(key)
