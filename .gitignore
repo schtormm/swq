@@ -1,0 +1,8 @@
+#ignore keys
+*.key
+
+# Ignore pycache directories
+**/__pycache__/
+
+#ignore db files
+*.db
