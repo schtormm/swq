@@ -1,20 +1,17 @@
-"""
-Urban Mobility Backend System - Database Module
-SQLite3 database with encrypted sensitive data and SQL injection protection
-"""
-
-import sqlite3
 import hashlib
-import os
-import zipfile
 import json
-from datetime import datetime, date
+import os
+import sqlite3
+import zipfile
 from contextlib import closing
-from um_encryption import encrypt_data, decrypt_data, encrypt_log_data, decrypt_log_data
-from um_utils import generate_customer_id, generate_restore_code, format_datetime
+from datetime import date, datetime
 
+from um_encryption import (decrypt_data, decrypt_log_data, encrypt_data,
+                           encrypt_log_data)
+from um_utils import (format_datetime, generate_customer_id,
+                      generate_restore_code)
 
-# Database configuration
+# config zooi
 DB_FILE = "urban_mobility.db"
 LOG_FILE = "um_system.log"
 BACKUP_DIR = "backups"
@@ -31,12 +28,10 @@ def get_db_connection():
 
 
 def initialize_database():
-    """Initialize database with all required tables"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
             
-            # Users table (backend system users)
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +46,6 @@ def initialize_database():
                 )
             ''')
             
-            # Travellers table (customers)
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS travellers (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +67,6 @@ def initialize_database():
                 )
             ''')
             
-            # Scooters table
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS scooters (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,8 +88,7 @@ def initialize_database():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
-            # System logs table
+
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS system_logs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -110,7 +102,6 @@ def initialize_database():
                 )
             ''')
             
-            # Create backup directory
             if not os.path.exists(BACKUP_DIR):
                 os.makedirs(BACKUP_DIR)
             
@@ -122,17 +113,13 @@ def initialize_database():
 
 
 def create_user(username, password, first_name, last_name, role):
-    """Create new user with encrypted sensitive data and hashed password"""
     try:
         from um_auth import hash_password
-        
-        # Hash password
+
         password_hash = hash_password(password)
         
-        # Hash username for lookup
         username_hash = hashlib.sha256(username.lower().encode('utf-8')).hexdigest()
-        
-        # Encrypt sensitive data
+
         encrypted_username = encrypt_data(username)
         encrypted_first_name = encrypt_data(first_name)
         encrypted_last_name = encrypt_data(last_name)
@@ -165,7 +152,6 @@ def create_user(username, password, first_name, last_name, role):
 
 
 def get_user_by_username(username):
-    """Get user by username with decrypted data"""
     try:
         username_hash = hashlib.sha256(username.lower().encode('utf-8')).hexdigest()
         
@@ -192,11 +178,9 @@ def get_user_by_username(username):
 
 
 def update_user(username, **kwargs):
-    """Update user data with field validation"""
     try:
         username_hash = hashlib.sha256(username.lower().encode('utf-8')).hexdigest()
         
-        # Build update query safely
         valid_fields = ['first_name', 'last_name', 'role']
         updates = []
         values = []
@@ -233,7 +217,6 @@ def update_user(username, **kwargs):
 
 
 def delete_user(username):
-    """Delete user account"""
     try:
         username_hash = hashlib.sha256(username.lower().encode('utf-8')).hexdigest()
         
@@ -258,7 +241,6 @@ def delete_user(username):
 
 
 def update_user_password(username, new_password):
-    """Update user password"""
     try:
         from um_auth import hash_password
         
@@ -287,7 +269,6 @@ def update_user_password(username, new_password):
 
 
 def get_all_users():
-    """Get all users with decrypted data"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -312,12 +293,9 @@ def get_all_users():
 
 
 def create_traveller(traveller_data):
-    """Create new traveller with encrypted sensitive data"""
     try:
-        # Generate unique customer ID
         customer_id = generate_customer_id()
         
-        # Encrypt sensitive data
         encrypted_data = {}
         sensitive_fields = ['first_name', 'last_name', 'birthday', 'gender', 'street_name',
                           'house_number', 'zip_code', 'city', 'email', 'mobile_phone', 
@@ -326,7 +304,7 @@ def create_traveller(traveller_data):
         for field in sensitive_fields:
             encrypted_data[field] = encrypt_data(traveller_data[field])
         
-        # Create search index (unencrypted for searching)
+        # ervoor zorgen dat je nog wel kan zoeken
         search_index = f"{traveller_data['first_name']} {traveller_data['last_name']} " \
                       f"{traveller_data['email']} {customer_id}".lower()
         
@@ -363,7 +341,6 @@ def create_traveller(traveller_data):
 
 
 def search_travellers(search_term):
-    """Search travellers using unencrypted search index"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -392,7 +369,6 @@ def search_travellers(search_term):
 
 
 def get_traveller_by_id(traveller_id):
-    """Get full traveller details by ID"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -424,9 +400,7 @@ def get_traveller_by_id(traveller_id):
 
 
 def update_traveller(traveller_id, **kwargs):
-    """Update traveller data"""
     try:
-        # Build update query safely
         valid_fields = ['first_name', 'last_name', 'birthday', 'gender', 'street_name',
                        'house_number', 'zip_code', 'city', 'email', 'mobile_phone',
                        'driving_license']
@@ -441,11 +415,10 @@ def update_traveller(traveller_id, **kwargs):
         if not updates:
             return False
             
-        # Update search index if relevant fields changed
+        #search index opnieuw updaten
         if any(field in ['first_name', 'last_name', 'email'] for field in kwargs.keys()):
             traveller = get_traveller_by_id(traveller_id)
             if traveller:
-                # Build new search index
                 new_search_index = f"{kwargs.get('first_name', traveller['first_name'])} " \
                                  f"{kwargs.get('last_name', traveller['last_name'])} " \
                                  f"{kwargs.get('email', traveller['email'])} " \
@@ -477,7 +450,6 @@ def update_traveller(traveller_id, **kwargs):
 
 
 def delete_traveller(traveller_id):
-    """Delete traveller record"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -500,12 +472,9 @@ def delete_traveller(traveller_id):
 
 
 def create_scooter(scooter_data):
-    """Create new scooter record"""
     try:
-        # Add in-service date
         in_service_date = datetime.now().isoformat()
         
-        # Create search index
         search_index = f"{scooter_data['brand']} {scooter_data['model']} " \
                       f"{scooter_data['serial_number']}".lower()
         
@@ -542,7 +511,6 @@ def create_scooter(scooter_data):
 
 
 def search_scooters(search_term):
-    """Search scooters using search index"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -572,7 +540,6 @@ def search_scooters(search_term):
 
 
 def get_scooter_by_id(scooter_id):
-    """Get full scooter details by ID"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -589,9 +556,7 @@ def get_scooter_by_id(scooter_id):
 
 
 def update_scooter(scooter_id, **kwargs):
-    """Update scooter data based on user role permissions"""
     try:
-        # All fields that can be updated
         valid_fields = ['brand', 'model', 'serial_number', 'top_speed', 'battery_capacity',
                        'state_of_charge', 'target_range_min', 'target_range_max',
                        'latitude', 'longitude', 'out_of_service', 'mileage',
@@ -608,7 +573,6 @@ def update_scooter(scooter_id, **kwargs):
         if not updates:
             return False
             
-        # Update search index if relevant fields changed
         if any(field in ['brand', 'model', 'serial_number'] for field in kwargs.keys()):
             scooter = get_scooter_by_id(scooter_id)
             if scooter:
@@ -642,7 +606,6 @@ def update_scooter(scooter_id, **kwargs):
 
 
 def delete_scooter(scooter_id):
-    """Delete scooter record"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -665,16 +628,13 @@ def delete_scooter(scooter_id):
 
 
 def log_event(username, description, additional_info="", suspicious=False):
-    """Log system event with encryption"""
     try:
-        # Get next log number
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT MAX(log_number) FROM system_logs')
             result = cursor.fetchone()
             log_number = (result[0] or 0) + 1
         
-        # Encrypt log data
         encrypted_username = encrypt_data(username)
         encrypted_description = encrypt_data(description)
         encrypted_additional_info = encrypt_data(additional_info)
@@ -692,7 +652,6 @@ def log_event(username, description, additional_info="", suspicious=False):
                   encrypted_additional_info, int(suspicious)))
             conn.commit()
             
-        # Also write to encrypted log file
         log_entry = {
             'log_number': log_number,
             'date_time': date_time,
@@ -711,7 +670,6 @@ def log_event(username, description, additional_info="", suspicious=False):
 
 
 def get_logs(only_suspicious=False, limit=100):
-    """Get system logs with decryption"""
     try:
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -750,7 +708,6 @@ def get_logs(only_suspicious=False, limit=100):
 
 
 def check_suspicious_logs_alert():
-    """Check for unread suspicious activities and alert administrators"""
     try:
         suspicious_logs = get_logs(only_suspicious=True, limit=10)
         if suspicious_logs:
@@ -762,21 +719,17 @@ def check_suspicious_logs_alert():
 
 
 def create_backup():
-    """Create system backup in zip format"""
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_filename = f"backup_{timestamp}.zip"
         backup_path = os.path.join(BACKUP_DIR, backup_filename)
         
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # Add database file
             zipf.write(DB_FILE, "database.db")
             
-            # Add log file if it exists
             if os.path.exists(LOG_FILE):
                 zipf.write(LOG_FILE, "system.log")
                 
-            # Add backup metadata
             metadata = {
                 'backup_date': datetime.now().isoformat(),
                 'version': '1.0',
@@ -799,22 +752,18 @@ def create_backup():
 
 
 def restore_backup(backup_filename):
-    """Restore system from backup file"""
     try:
         backup_path = os.path.join(BACKUP_DIR, backup_filename)
         
         if not os.path.exists(backup_path):
             raise FileNotFoundError("Backup file not found")
         
-        # Create backup of current database before restore
         current_backup = create_backup()
         
         with zipfile.ZipFile(backup_path, 'r') as zipf:
-            # Extract database
             zipf.extract("database.db", ".")
             os.rename("database.db", DB_FILE)
             
-            # Extract log file if exists
             if "system.log" in zipf.namelist():
                 zipf.extract("system.log", ".")
                 os.rename("system.log", LOG_FILE)
@@ -834,7 +783,6 @@ def restore_backup(backup_filename):
 
 
 def list_backups():
-    """List available backup files"""
     try:
         backups = []
         if os.path.exists(BACKUP_DIR):
