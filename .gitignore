@@ -7,3 +7,6 @@
 #ignore db files
 *.db
 um_system.log
+
+#ignore backups directory
+backups/
