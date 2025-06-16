@@ -8,8 +8,7 @@ from datetime import date, datetime
 
 from encryption import (decrypt_data, decrypt_log_data, encrypt_data,
                         encrypt_log_data)
-from um_utils import (format_datetime, generate_customer_id,
-                      generate_restore_code)
+from utils import format_datetime, generate_customer_id, generate_restore_code
 
 # config zooi
 DB_FILE = "urban_mobility.db"

@@ -6,7 +6,7 @@ True whitelisting-based input validation for security
 import re
 from datetime import date, datetime
 
-from um_utils import get_cities_list, validate_latitude, validate_longitude
+from utils import get_cities_list, validate_latitude, validate_longitude
 
 # WHITELISTING PATTERNS - Only define what IS allowed
 # Names: Only letters, spaces, apostrophes, hyphens (1-50 chars)

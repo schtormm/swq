@@ -3,10 +3,9 @@ Urban Mobility Backend System - UI Operations Module
 Detailed form handling and CRUD operations for the user interface
 """
 
-from um_database import *
-from um_utils import create_display_table, get_cities_list, print_sub_header
-
 from auth import current_user
+from database import *
+from utils import create_display_table, get_cities_list, print_sub_header
 from validation import *
 
 
@@ -145,7 +144,7 @@ def reset_user_password_ui(user_role):
     print_sub_header(f"Reset {user_role.replace('_', ' ').title()} Password")
     
     try:
-        from um_utils import generate_temp_password
+        from utils import generate_temp_password
         
         username = get_validated_input("Username to reset: ", validate_username)
         

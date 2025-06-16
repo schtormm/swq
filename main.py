@@ -8,11 +8,10 @@ import os
 import sys
 from datetime import datetime
 
-from um_database import check_suspicious_logs_alert, initialize_database
-
 from auth import current_user, initialize_hard_coded_super_admin, login, logout
+from database import check_suspicious_logs_alert, initialize_database
 from encryption import initialize_encryption
-from um_utils import print_header, print_separator
+from utils import print_header, print_separator
 from view import display_main_menu
 
 
