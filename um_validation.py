@@ -31,11 +31,14 @@ SEARCH_PATTERN = r'^[A-Za-z0-9\s\'\-\.@]{1,100}$'
 
 ISO_DATUM_PATTERN = r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
 
-PERCENTAGE_PATTERN = r'^(100|[1-9]?[0-9])$'
+# Percentage: 0-100 as whole numbers (including 0)
+PERCENTAGE_PATTERN = r'^(100|[0-9]?[0-9])$'
 
-POSITIVE_INTEGER_PATTERN = r'^[1-9][0-9]*$'
+# Positive integers: 1 or more digits, no leading zeros except single 0 (allow 0)
+POSITIVE_INTEGER_PATTERN = r'^(0|[1-9][0-9]*)$'
 
-POSITIVE_FLOAT_PATTERN = r'^[0-9]+\.?[0-9]*$'
+# Positive floats: Numbers with optional decimal places, no leading zeros, no trailing decimal
+POSITIVE_FLOAT_PATTERN = r'^(0|[1-9][0-9]*)(\.[0-9]+)?$'
 
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
 
@@ -74,10 +77,10 @@ def validate_username(username):
         isinstance(username, str) and 
         is_safe_string(username) and 
         is_valid_length(username, 8, 10) and 
-        re.fullmatch(USERNAME_PATTERN, username)):
+        re.fullmatch(USERNAME_PATTERN, username.lower())):  # Case-insensitive validation
         return True, ""
     else:
-        return False, "Username must be 8-10 characters, start with letter/underscore, contain only letters, numbers, underscores, apostrophes, periods"
+        return False, "Username must be 8-10 characters, start with letter/underscore, contain only letters, numbers, underscores, apostrophes, periods (case-insensitive)"
 
 
 def validate_password(password):
