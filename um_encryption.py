@@ -6,8 +6,7 @@ Symmetric encryption for sensitive data in database and logs
 import os
 import base64
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
 
 
 # Global encryption object
@@ -104,30 +103,6 @@ def decrypt_log_data(encrypted_log_data):
         Decrypted log data as string
     """
     return decrypt_data(encrypted_log_data)
-
-
-def secure_delete_key():
-    """
-    Securely delete encryption key (for system reset scenarios)
-    WARNING: This will make all encrypted data unrecoverable!
-    """
-    global _cipher
-    _cipher = None
-    
-    if os.path.exists(KEY_FILE):
-        # Overwrite file with random data before deletion
-        file_size = os.path.getsize(KEY_FILE)
-        with open(KEY_FILE, 'rb+') as f:
-            f.write(os.urandom(file_size))
-            f.flush()
-            os.fsync(f.fileno())
-        
-        os.remove(KEY_FILE)
-
-
-def is_encryption_initialized():
-    """Check if encryption system is properly initialized"""
-    return _cipher is not None and os.path.exists(KEY_FILE)
 
 
 # Initialize encryption when module is imported
