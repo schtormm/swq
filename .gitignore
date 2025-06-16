@@ -10,3 +10,9 @@ um_system.log
 
 #ignore backups directory
 backups/
+
+#ignore log files
+*.log
+
+#ignore backup files
+backup_*.zip
