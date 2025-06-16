@@ -6,8 +6,8 @@ import zipfile
 from contextlib import closing
 from datetime import date, datetime
 
-from um_encryption import (decrypt_data, decrypt_log_data, encrypt_data,
-                           encrypt_log_data)
+from encryption import (decrypt_data, decrypt_log_data, encrypt_data,
+                        encrypt_log_data)
 from um_utils import (format_datetime, generate_customer_id,
                       generate_restore_code)
 
@@ -114,7 +114,7 @@ def initialize_database():
 
 def create_user(username, password, first_name, last_name, role):
     try:
-        from um_auth import hash_password
+        from auth import hash_password
 
         password_hash = hash_password(password)
         
@@ -242,7 +242,7 @@ def delete_user(username):
 
 def update_user_password(username, new_password):
     try:
-        from um_auth import hash_password
+        from auth import hash_password
         
         username_hash = hashlib.sha256(username.lower().encode('utf-8')).hexdigest()
         password_hash = hash_password(new_password)

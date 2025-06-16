@@ -5,10 +5,10 @@ Urban Mobility Backend System - authentication en authorization
 from datetime import datetime
 
 import bcrypt
-
 from um_database import create_user, get_user_by_username, log_event
 from um_utils import print_header, print_sub_header
-from um_validation import validate_password, validate_username
+
+from validation import validate_password, validate_username
 
 current_user = {"username": None, "role": None, "user_id": None}
 

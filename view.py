@@ -3,12 +3,13 @@ Urban Mobility Backend System - User Interface Module
 Console-based interface with role-specific menus and operations
 """
 
-from um_auth import (can_access_logs, can_add_delete_scooters,
-                     can_backup_restore, can_manage_role, can_manage_scooters,
-                     can_manage_travellers, current_user, logout, require_role)
-from um_ui_operations import *
 from um_utils import (create_display_table, print_header, print_separator,
                       print_sub_header)
+
+from auth import (can_access_logs, can_add_delete_scooters, can_backup_restore,
+                  can_manage_role, can_manage_scooters, can_manage_travellers,
+                  current_user, logout, require_role)
+from ui_functions import *
 
 
 def display_main_menu():
@@ -320,7 +321,8 @@ def update_own_password():
     
     try:
         from um_database import update_user_password
-        from um_validation import get_validated_input, validate_password
+
+        from validation import get_validated_input, validate_password
 
         new_password = get_validated_input(
             "Enter new password: ",

@@ -8,12 +8,12 @@ import os
 import sys
 from datetime import datetime
 
-from um_auth import (current_user, initialize_hard_coded_super_admin, login,
-                     logout)
 from um_database import check_suspicious_logs_alert, initialize_database
-from um_encryption import initialize_encryption
-from um_ui import display_main_menu
+
+from auth import current_user, initialize_hard_coded_super_admin, login, logout
+from encryption import initialize_encryption
 from um_utils import print_header, print_separator
+from view import display_main_menu
 
 
 def initialize_system():

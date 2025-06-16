@@ -3,10 +3,11 @@ Urban Mobility Backend System - UI Operations Module
 Detailed form handling and CRUD operations for the user interface
 """
 
-from um_auth import current_user
 from um_database import *
 from um_utils import create_display_table, get_cities_list, print_sub_header
-from um_validation import *
+
+from auth import current_user
+from validation import *
 
 
 def list_users_ui(user_role):
