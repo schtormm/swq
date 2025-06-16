@@ -6,3 +6,9 @@
 
 #ignore db files
 *.db
+
+#ignore log files
+*.log
+
+#ignore backup files
+backup_*.zip
