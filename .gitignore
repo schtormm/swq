@@ -6,13 +6,12 @@
 
 #ignore db files
 *.db
-um_system.log
 
-#ignore backups directory
+#ignore backup files
+backup_*.zip
 backups/
 
 #ignore log files
 *.log
+um_system.log
 
-#ignore backup files
-backup_*.zip

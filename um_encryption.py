@@ -1,7 +1,6 @@
 #encryptie stuff
 import base64
 import os
-
 from cryptography.fernet import Fernet
 
 _cipher = None
@@ -64,6 +63,7 @@ def decrypt_log_data(encrypted_log_data):
     return decrypt_data(encrypted_log_data)
 
 
+
 def secure_delete_key():
     global _cipher
     _cipher = None
@@ -83,6 +83,8 @@ def is_encryption_initialized():
     return _cipher is not None and os.path.exists(KEY_FILE)
 
 
+
+# Initialize encryption when module is imported
 try:
     initialize_encryption()
 except Exception:
