@@ -1,8 +1,4 @@
-"""
-Urban Mobility Backend System - UI Operations Module
-Detailed form handling and CRUD operations for the user interface
-"""
-
+# CRUD en zoek-stuff 
 from auth import current_user
 from database import *
 from utils import create_display_table, get_cities_list, print_sub_header
@@ -711,7 +707,6 @@ def revoke_restore_code_ui():
             print("No active restore codes to revoke.")
             return
         
-        # Show active codes
         print("Active restore codes:")
         for i, code_info in enumerate(codes, 1):
             print(f"{i}. {code_info['code']} (Admin: {code_info['admin_username']}, Backup: {code_info['backup_file']})")
@@ -719,7 +714,6 @@ def revoke_restore_code_ui():
         choice = get_validated_input(f"Select code to revoke (1-{len(codes)}): ", validate_positive_integer, "Choice", 1, len(codes))
         selected_code = codes[int(choice) - 1]
         
-        # Confirm revocation
         confirm = input(f"Revoke code {selected_code['code']}? (yes/no): ").lower()
         
         if confirm == 'yes':
@@ -746,7 +740,6 @@ def use_restore_code_ui():
             print("❌ Restore code cannot be empty.")
             return
         
-        # Use the code
         success, message = use_restore_code(code, current_user["username"])
         
         if success:

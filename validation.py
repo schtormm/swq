@@ -1,8 +1,4 @@
-"""
-Urban Mobility Backend System - Input Validation Module
-True whitelisting-based input validation for security
-"""
-
+# validatie, met whitelisting deze keer!!!
 import re
 from datetime import date, datetime
 

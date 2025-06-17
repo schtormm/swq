@@ -1,8 +1,4 @@
-"""
-Urban Mobility Backend System - Encryption Module
-Symmetric encryption for sensitive data in database and logs
-"""
-
+#encryptie stuff
 import base64
 import os
 
@@ -75,7 +71,7 @@ def secure_delete_key():
     _cipher = None
     
     if os.path.exists(KEY_FILE):
-        # Overwrite file with random data before deletion
+        #key file overschrijven met willekeurige data om hacken moeilijker te maken
         file_size = os.path.getsize(KEY_FILE)
         with open(KEY_FILE, 'rb+') as f:
             f.write(os.urandom(file_size))

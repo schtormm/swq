@@ -1,6 +1,4 @@
-"""
-Urban Mobility Backend System - authentication en authorization
-"""
+# authentication en authorization functies
 
 from datetime import datetime
 
@@ -165,9 +163,6 @@ def check_permission(required_roles):
     """
     RBAC dingetje
     Gebruikt decorator om te checken of user de juiste rol heeft
-    Args:
-        required_roles: List of roles that can access the function
-
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -191,38 +186,22 @@ def check_permission(required_roles):
 
 
 def require_role(*roles):
-    """
-    Simple role requirement check
-    Args:
-        roles: Roles that are allowed
-    Returns:
-        True if user has required role, False otherwise
-    """
     return current_user["role"] in roles
 
 
 def is_logged_in():
-    """Check if user is currently logged in"""
     return current_user["username"] is not None
 
 
 def get_current_user():
-    """Get current user information"""
     return current_user.copy()
 
 
 def has_role(role):
-    """Check if current user has specific role"""
     return current_user["role"] == role
 
 
 def can_manage_role(target_role):
-    """
-    Check if current user can manage accounts of target role
-    Super Admin can manage System Admins and Service Engineers
-    System Admin can manage Service Engineers only
-    Service Engineers cannot manage any accounts
-    """
     current_role = current_user["role"]
     
     if current_role == "super_admin":

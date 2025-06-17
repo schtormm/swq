@@ -1,8 +1,4 @@
-"""
-Urban Mobility Backend System - User Interface Module
-Console-based interface with role-specific menus and operations
-"""
-
+# views voor menu's
 from auth import (can_access_logs, can_add_delete_scooters, can_backup_restore,
                   can_manage_role, can_manage_scooters, can_manage_travellers,
                   current_user, logout, require_role)

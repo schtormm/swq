@@ -1,8 +1,5 @@
-"""
-Urban Mobility Backend System - Utility Functions
-Common utility functions used throughout the system
-"""
 
+#utils voor gebruik in rest v/h systeem
 import random
 import string
 from datetime import datetime

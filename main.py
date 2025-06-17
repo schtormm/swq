@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""
-Urban Mobility Backend System
-Main entry point for the console-based interface
-"""
-
+# main deel van de applicatie
 import os
 import sys
 from datetime import datetime

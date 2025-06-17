@@ -1,3 +1,4 @@
+#database access dingen
 import hashlib
 import json
 import os
@@ -15,7 +16,6 @@ DB_FILE = "urban_mobility.db"
 LOG_FILE = "um_system.log"
 BACKUP_DIR = "backups"
 
-# Restore codes storage (in production this would be in database)
 restore_codes = {}  # {code: {admin_username: str, backup_file: str, created: datetime}}
 
 

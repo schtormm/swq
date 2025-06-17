@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Urban Mobility Backend System
-Required main entry point file as specified in the assignment
-"""
+# zodat de applicatie gestartt kan worden zoals er in de opdracht staat
 
 from main import main
 
