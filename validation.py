@@ -8,54 +8,48 @@ from datetime import date, datetime
 
 from utils import get_cities_list, validate_latitude, validate_longitude
 
-# WHITELISTING PATTERNS - Only define what IS allowed
-# Names: Only letters, spaces, apostrophes, hyphens (1-50 chars)
+# whitelisting - wat mag er wel
+# naam regex
 NAME_PATTERN = r'^[A-Za-z\s\'\-]{1,50}$'
 
-# Username: Start with letter/underscore, then letters/numbers/underscore/apostrophe/period (8-10 total)
+#username regex
 USERNAME_PATTERN = r'^[A-Za-z_][A-Za-z0-9_\'\.]{7,9}$'
 
-# Email: Standard email format with whitelisted characters
+#email regex
 EMAIL_PATTERN = r'^[a-zA-Z0-9\._%+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}$'
 
-# Mobile phone: Exactly 8 digits (Dutch format without +31-6- prefix)
+# 8 nummers voor telefoonnummer
 PHONE_PATTERN = r'^[0-9]{8}$'
 
-# Dutch zip code: Exactly 4 digits followed by 2 uppercase letters
+# postcode regex (dus 1234AB oid)
 ZIP_CODE_PATTERN = r'^[0-9]{4}[A-Z]{2}$'
 
-# Driving license: 1 letter followed by 6-7 digits
+# regex voor rijbewijs
 DRIVING_LICENSE_PATTERN = r'^[A-Z][0-9]{6,7}$'
 
-# Serial number: 10-17 alphanumeric characters only
+# regex voor scooter serienummers
 SERIAL_NUMBER_PATTERN = r'^[A-Za-z0-9]{10,17}$'
 
-# Search terms: Letters, numbers, spaces, apostrophes, hyphens, dots, @ symbols
+# alle dingen die in zoekopdracht mogen zitten
 SEARCH_PATTERN = r'^[A-Za-z0-9\s\'\-\.@]{1,100}$'
 
-# Date: Exactly YYYY-MM-DD format
-ISO_DATE_PATTERN = r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+ISO_DATUM_PATTERN = r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
 
-# Percentage: 0-100 as whole numbers
 PERCENTAGE_PATTERN = r'^(100|[1-9]?[0-9])$'
 
-# Positive integers: 1 or more digits, no leading zeros except single 0
 POSITIVE_INTEGER_PATTERN = r'^[1-9][0-9]*$'
 
-# Positive floats: Numbers with optional decimal places, no leading zeros
 POSITIVE_FLOAT_PATTERN = r'^[0-9]+\.?[0-9]*$'
 
-# GPS coordinates: Numbers with exactly 5 decimal places
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
 
-# Password whitelisted characters
+# regexes voor in wachtwoord
 PASSWORD_ALLOWED_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 PASSWORD_LOWERCASE = set('abcdefghijklmnopqrstuvwxyz')
 PASSWORD_UPPERCASE = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 PASSWORD_DIGITS = set('0123456789')
 PASSWORD_SPECIAL = set('~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 
-# Allowed values whitelists
 ALLOWED_GENDERS = {"male", "female"} 
 
 def is_safe_string(input_str):
@@ -172,7 +166,7 @@ def validate_date(date_str, field_name="Date"):
     if (date_str and 
         isinstance(date_str, str) and 
         is_safe_string(date_str) and 
-        re.fullmatch(ISO_DATE_PATTERN, date_str)):
+        re.fullmatch(ISO_DATUM_PATTERN, date_str)):
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
             return True, ""
