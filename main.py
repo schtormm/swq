@@ -29,7 +29,7 @@ def initialize_system():
         print_separator()
         
     except Exception as e:
-        print(f"❌ System initialization failed: {str(e)}")
+        print(f"System initialization failed: {str(e)}")
         sys.exit(1)
 
 

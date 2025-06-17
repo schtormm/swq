@@ -17,7 +17,7 @@ def display_main_menu():
     elif role == "service_engineer":
         service_engineer_menu()
     else:
-        print("❌ Unknown role. Please contact administrator.")
+        print("Unknown role. Please contact administrator.")
         logout()
 
 
@@ -56,7 +56,7 @@ def super_admin_menu():
             logout()
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         input("\nPress Enter to continue...")
 
@@ -93,7 +93,7 @@ def system_admin_menu():
             logout()
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         input("\nPress Enter to continue...")
 
@@ -121,7 +121,7 @@ def service_engineer_menu():
             logout()
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         input("\nPress Enter to continue...")
 
@@ -154,7 +154,7 @@ def manage_users_menu(user_role):
         elif choice == "6":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "6":
             input("\nPress Enter to continue...")
@@ -183,7 +183,7 @@ def manage_travellers_menu():
         elif choice == "5":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "5":
             input("\nPress Enter to continue...")
@@ -205,7 +205,7 @@ def manage_scooters_menu():
             if can_add_delete_scooters():
                 add_scooter_ui()
             else:
-                print("❌ Access denied: You cannot add scooters.")
+                print("Access denied: You cannot add scooters.")
         elif choice == "2":
             search_scooters_ui()
         elif choice == "3":
@@ -214,11 +214,11 @@ def manage_scooters_menu():
             if can_add_delete_scooters():
                 delete_scooter_ui()
             else:
-                print("❌ Access denied: You cannot delete scooters.")
+                print("Access denied: You cannot delete scooters.")
         elif choice == "5":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "5":
             input("\nPress Enter to continue...")
@@ -246,13 +246,13 @@ def backup_restore_menu():
             if current_user["role"] == "super_admin":
                 restore_backup_ui()
             else:
-                print("❌ Access denied: System Administrators must use restore codes.")
+                print("Access denied: System Administrators must use restore codes.")
         elif choice == "4" and current_user["role"] == "system_admin":
             use_restore_code_ui()
         elif choice == "5":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "5":
             input("\nPress Enter to continue...")
@@ -260,7 +260,7 @@ def backup_restore_menu():
 
 def generate_restore_codes_menu():
     if current_user["role"] != "super_admin":
-        print("❌ Access denied: Only Super Administrator can generate restore codes.")
+        print("Access denied: Only Super Administrator can generate restore codes.")
         return
         
     while True:
@@ -282,7 +282,7 @@ def generate_restore_codes_menu():
         elif choice == "4":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "4":
             input("\nPress Enter to continue...")
@@ -305,7 +305,7 @@ def view_logs_menu():
         elif choice == "3":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "3":
             input("\nPress Enter to continue...")
@@ -326,18 +326,18 @@ def update_own_password():
         confirm_password = input("Confirm new password: ")
         
         if new_password != confirm_password:
-            print("❌ Passwords do not match.")
+            print("Passwords do not match.")
             return
         
         if update_user_password(current_user["username"], new_password):
-            print("✅ Password updated successfully.")
+            print("Password updated successfully.")
         else:
-            print("❌ Failed to update password.")
+            print("Failed to update password.")
             
     except KeyboardInterrupt:
         print("\nPassword update cancelled.")
     except Exception as e:
-        print(f"❌ Error updating password: {str(e)}")
+        print(f"Error updating password: {str(e)}")
 
 
 def main_menu_wrapper():
@@ -346,5 +346,5 @@ def main_menu_wrapper():
     except KeyboardInterrupt:
         print("\nReturning to main menu...")
     except Exception as e:
-        print(f"❌ An error occurred: {str(e)}")
+        print(f"An error occurred: {str(e)}")
         print("Returning to main menu...") 

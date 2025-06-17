@@ -80,11 +80,11 @@ def login():
         try:
             username = input("Username: ").strip().lower()
             if not username:
-                print("❌ Username cannot be empty")
+                print("Username cannot be empty")
                 continue
                 
             if not check_login_attempts(username):
-                print("❌ Too many failed login attempts. Please try again later.")
+                print("Too many failed login attempts. Please try again later.")
                 log_event(
                     username=username,
                     description="Login blocked due to too many failed attempts",
@@ -95,7 +95,7 @@ def login():
             
             password = input("Password: ")
             if not password:
-                print("❌ Password cannot be empty")
+                print("Password cannot be empty")
                 continue
             
             user = get_user_by_username(username)
@@ -113,7 +113,7 @@ def login():
                     suspicious=False
                 )
                 
-                print(f"✅ Login successful! Welcome {user['first_name']} {user['last_name']}")
+                print(f"Login successful! Welcome {user['first_name']} {user['last_name']}")
                 print(f"Role: {user['role'].replace('_', ' ').title()}")
                 return True
             else:
@@ -126,7 +126,7 @@ def login():
                     suspicious=True if attempt > 0 else False
                 )
                 
-                print("❌ Invalid username or password")
+                print("Invalid username or password")
                 
                 if attempt < max_attempts - 1:
                     print(f"Please try again. ({max_attempts - attempt - 1} attempts remaining)")
@@ -135,10 +135,10 @@ def login():
             print("\nLogin cancelled.")
             return False
         except Exception as e:
-            print(f"❌ Login error: {str(e)}")
+            print(f"Login error: {str(e)}")
             
             
-    print("❌ Maximum login attempts exceeded.")
+    print("Maximum login attempts exceeded.")
     return False
 
 
@@ -169,7 +169,7 @@ def check_permission(required_roles):
             if current_user["role"] in required_roles:
                 return func(*args, **kwargs)
             else:
-                print("❌ Access denied: Insufficient permissions")
+                print("Access denied: Insufficient permissions")
                 
                 username = current_user["username"] if current_user["username"] else "Unknown"
                 role = current_user["role"] if current_user["role"] else "None"

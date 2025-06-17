@@ -279,12 +279,12 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
             if is_valid:
                 return user_input
             else:
-                print(f"❌ {error_msg}")
+                print(f"{error_msg}")
                 
         except KeyboardInterrupt:
             raise
         except Exception as e:
-            print(f"❌ Input validation error: {str(e)}")
+            print(f"Input validation error: {str(e)}")
 
 
 def validate_choice(choice, valid_choices):
