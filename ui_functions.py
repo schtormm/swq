@@ -1,16 +1,11 @@
-"""
-Urban Mobility Backend System - UI Operations Module
-Detailed form handling and CRUD operations for the user interface
-"""
-
-from um_validation import *
-from um_database import *
-from um_utils import print_sub_header, create_display_table, get_cities_list
-from um_auth import current_user
+# CRUD en zoek-stuff 
+from auth import current_user
+from database import *
+from utils import create_display_table, get_cities_list, print_sub_header
+from validation import *
 
 
 def list_users_ui(user_role):
-    """List users of specific role"""
     print_sub_header(f"List {user_role.replace('_', ' ').title()}s")
     
     try:
@@ -35,67 +30,60 @@ def list_users_ui(user_role):
         print(create_display_table(headers, rows))
         
     except Exception as e:
-        print(f"❌ Error listing users: {str(e)}")
+        print(f"Error listing users: {str(e)}")
 
 
 def add_user_ui(user_role):
-    """Add new user with role-specific validation"""
     print_sub_header(f"Add New {user_role.replace('_', ' ').title()}")
     
     try:
-        # Get validated inputs
         username = get_validated_input("Username (8-10 characters): ", validate_username)
         password = get_validated_input("Password (12-30 characters): ", validate_password)
         first_name = get_validated_input("First Name: ", validate_name, "First Name")
         last_name = get_validated_input("Last Name: ", validate_name, "Last Name")
         
-        # Create user
         create_user(username, password, first_name, last_name, user_role)
-        print(f"✅ {user_role.replace('_', ' ').title()} created successfully!")
+        print(f"{user_role.replace('_', ' ').title()} created successfully!")
         
     except ValueError as e:
-        print(f"❌ {str(e)}")
+        print(f"Error: {str(e)}")
     except KeyboardInterrupt:
         print("\nUser creation cancelled.")
     except Exception as e:
-        print(f"❌ Error creating user: {str(e)}")
+        print(f"Error creating user: {str(e)}")
 
 
 def update_user_ui(user_role):
-    """Update existing user"""
     print_sub_header(f"Update {user_role.replace('_', ' ').title()}")
     
     try:
         username = get_validated_input("Username to update: ", validate_username)
         
-        # Check if user exists and has correct role
         user = get_user_by_username(username)
         if not user:
-            print("❌ User not found.")
+            print("User not found.")
             return
         
         if user['role'] != user_role:
-            print(f"❌ User is not a {user_role.replace('_', ' ')}.")
+            print(f"User is not a {user_role.replace('_', ' ')}.")
             return
         
         print(f"\nCurrent details for {username}:")
         print(f"First Name: {user['first_name']}")
         print(f"Last Name: {user['last_name']}")
         
-        # Get new details (optional)
         print("\nEnter new details (press Enter to keep current):")
         
         new_first_name = input(f"First Name [{user['first_name']}]: ").strip()
         if new_first_name and not validate_name(new_first_name, "First Name")[0]:
-            print("❌ Invalid first name.")
+            print("Invalid first name.")
             return
         
         new_last_name = input(f"Last Name [{user['last_name']}]: ").strip()
         if new_last_name and not validate_name(new_last_name, "Last Name")[0]:
-            print("❌ Invalid last name.")
+            print("Invalid last name.")
             return
         
-        # Update user
         updates = {}
         if new_first_name:
             updates['first_name'] = new_first_name
@@ -104,97 +92,88 @@ def update_user_ui(user_role):
         
         if updates:
             if update_user(username, **updates):
-                print("✅ User updated successfully!")
+                print("User updated successfully!")
             else:
-                print("❌ Failed to update user.")
+                print("Failed to update user.")
         else:
             print("No changes made.")
             
     except KeyboardInterrupt:
         print("\nUpdate cancelled.")
     except Exception as e:
-        print(f"❌ Error updating user: {str(e)}")
+        print(f"Error updating user: {str(e)}")
 
 
 def delete_user_ui(user_role):
-    """Delete user with confirmation"""
     print_sub_header(f"Delete {user_role.replace('_', ' ').title()}")
     
     try:
         username = get_validated_input("Username to delete: ", validate_username)
         
-        # Check if user exists and has correct role
         user = get_user_by_username(username)
         if not user:
-            print("❌ User not found.")
+            print("User not found.")
             return
         
         if user['role'] != user_role:
-            print(f"❌ User is not a {user_role.replace('_', ' ')}.")
+            print(f"User is not a {user_role.replace('_', ' ')}.")
             return
         
-        # Confirm deletion
         print(f"\nUser to delete: {user['first_name']} {user['last_name']} ({username})")
         confirm = input("Are you sure you want to delete this user? (yes/no): ").lower()
         
         if confirm == 'yes':
             if delete_user(username):
-                print("✅ User deleted successfully!")
+                print("User deleted successfully!")
             else:
-                print("❌ Failed to delete user.")
+                print("Failed to delete user.")
         else:
             print("Deletion cancelled.")
             
     except KeyboardInterrupt:
         print("\nDeletion cancelled.")
     except Exception as e:
-        print(f"❌ Error deleting user: {str(e)}")
+        print(f"Error deleting user: {str(e)}")
 
 
 def reset_user_password_ui(user_role):
-    """Reset user password with temporary password"""
     print_sub_header(f"Reset {user_role.replace('_', ' ').title()} Password")
     
     try:
-        from um_utils import generate_temp_password
+        from utils import generate_temp_password
         
         username = get_validated_input("Username to reset: ", validate_username)
         
-        # Check if user exists and has correct role
         user = get_user_by_username(username)
         if not user:
-            print("❌ User not found.")
+            print("User not found.")
             return
         
         if user['role'] != user_role:
-            print(f"❌ User is not a {user_role.replace('_', ' ')}.")
+            print(f"User is not a {user_role.replace('_', ' ')}.")
             return
         
-        # Generate temporary password
         temp_password = generate_temp_password()
         
-        # Update password
         if update_user_password(username, temp_password):
-            print("✅ Password reset successfully!")
+            print("Password reset successfully!")
             print(f"Temporary password: {temp_password}")
             print("Please provide this to the user and advise them to change it immediately.")
         else:
-            print("❌ Failed to reset password.")
+            print("Failed to reset password.")
             
     except KeyboardInterrupt:
         print("\nPassword reset cancelled.")
     except Exception as e:
-        print(f"❌ Error resetting password: {str(e)}")
+        print(f"Error resetting password: {str(e)}")
 
 
 def add_traveller_ui():
-    """Add new traveller"""
     print_sub_header("Add New Traveller")
     
     try:
         print("Enter traveller information:")
         
-        # Collect all required data
         first_name = get_validated_input("First Name: ", validate_name, "First Name")
         last_name = get_validated_input("Last Name: ", validate_name, "Last Name")
         birthday = get_validated_input("Birthday (YYYY-MM-DD): ", validate_date, "Birthday")
@@ -203,7 +182,6 @@ def add_traveller_ui():
         house_number = get_validated_input("House Number: ", validate_positive_integer, "House Number", 1, 10000)
         zip_code = get_validated_input("Zip Code (DDDDXX): ", validate_zip_code)
         
-        # City selection
         cities = get_cities_list()
         print(f"Available cities: {', '.join(cities)}")
         city = get_validated_input("City: ", validate_city)
@@ -212,7 +190,6 @@ def add_traveller_ui():
         mobile_phone = get_validated_input("Mobile Phone (8 digits only): ", validate_mobile_phone)
         driving_license = get_validated_input("Driving License (XXDDDDDDD or XDDDDDDDD): ", validate_driving_license)
         
-        # Create traveller data
         traveller_data = {
             'first_name': first_name,
             'last_name': last_name,
@@ -227,18 +204,16 @@ def add_traveller_ui():
             'driving_license': driving_license
         }
         
-        # Create traveller
         customer_id = create_traveller(traveller_data)
-        print(f"✅ Traveller created successfully! Customer ID: {customer_id}")
+        print(f"Traveller created successfully! Customer ID: {customer_id}")
         
     except KeyboardInterrupt:
         print("\nTraveller creation cancelled.")
     except Exception as e:
-        print(f"❌ Error creating traveller: {str(e)}")
+        print(f"Error creating traveller: {str(e)}")
 
 
 def search_travellers_ui():
-    """Search travellers"""
     print_sub_header("Search Travellers")
     
     try:
@@ -267,15 +242,13 @@ def search_travellers_ui():
     except KeyboardInterrupt:
         print("\nSearch cancelled.")
     except Exception as e:
-        print(f"❌ Error searching travellers: {str(e)}")
+        print(f"Error searching travellers: {str(e)}")
 
 
 def update_traveller_ui():
-    """Update traveller information"""
     print_sub_header("Update Traveller")
     
     try:
-        # First search for the traveller
         search_term = get_validated_input("Search for traveller to update: ", validate_search_term)
         results = search_travellers(search_term)
         
@@ -285,7 +258,6 @@ def update_traveller_ui():
         
         if len(results) > 1:
             print(f"Multiple travellers found. Please be more specific.")
-            # Show results
             headers = ['ID', 'Customer ID', 'Name', 'Email']
             rows = [[str(t['id']), t['customer_id'], f"{t['first_name']} {t['last_name']}", t['email']] for t in results]
             print(create_display_table(headers, rows))
@@ -294,16 +266,14 @@ def update_traveller_ui():
         else:
             traveller_id = results[0]['id']
         
-        # Get full traveller details
         traveller = get_traveller_by_id(int(traveller_id))
         if not traveller:
-            print("❌ Traveller not found.")
+            print("Traveller not found.")
             return
         
         print(f"\nUpdating traveller: {traveller['first_name']} {traveller['last_name']}")
         print("Enter new values (press Enter to keep current):")
         
-        # Collect updates
         updates = {}
         
         new_first_name = input(f"First Name [{traveller['first_name']}]: ").strip()
@@ -318,27 +288,24 @@ def update_traveller_ui():
         if new_email and validate_email(new_email)[0]:
             updates['email'] = new_email
         
-        # Apply updates
         if updates:
             if update_traveller(traveller['id'], **updates):
-                print("✅ Traveller updated successfully!")
+                print("Traveller updated successfully!")
             else:
-                print("❌ Failed to update traveller.")
+                print("Failed to update traveller.")
         else:
             print("No changes made.")
             
     except KeyboardInterrupt:
         print("\nUpdate cancelled.")
     except Exception as e:
-        print(f"❌ Error updating traveller: {str(e)}")
+        print(f"Error updating traveller: {str(e)}")
 
 
 def delete_traveller_ui():
-    """Delete traveller with confirmation"""
     print_sub_header("Delete Traveller")
     
     try:
-        # Search for traveller
         search_term = get_validated_input("Search for traveller to delete: ", validate_search_term)
         results = search_travellers(search_term)
         
@@ -355,14 +322,12 @@ def delete_traveller_ui():
             traveller_id = get_validated_input("Enter traveller ID to delete: ", validate_positive_integer, "Traveller ID")
         else:
             traveller_id = results[0]['id']
-        
-        # Get full details for confirmation
+
         traveller = get_traveller_by_id(int(traveller_id))
         if not traveller:
-            print("❌ Traveller not found.")
+            print("Traveller not found.")
             return
         
-        # Confirm deletion
         print(f"\nTraveller to delete:")
         print(f"Name: {traveller['first_name']} {traveller['last_name']}")
         print(f"Customer ID: {traveller['customer_id']}")
@@ -372,20 +337,19 @@ def delete_traveller_ui():
         
         if confirm == 'yes':
             if delete_traveller(traveller['id']):
-                print("✅ Traveller deleted successfully!")
+                print("Traveller deleted successfully!")
             else:
-                print("❌ Failed to delete traveller.")
+                print("Failed to delete traveller.")
         else:
             print("Deletion cancelled.")
             
     except KeyboardInterrupt:
         print("\nDeletion cancelled.")
     except Exception as e:
-        print(f"❌ Error deleting traveller: {str(e)}")
+        print(f"Error deleting traveller: {str(e)}")
 
 
 def add_scooter_ui():
-    """Add new scooter"""
     print_sub_header("Add New Scooter")
     
     try:
@@ -400,7 +364,6 @@ def add_scooter_ui():
         target_range_min = get_validated_input("Target Range Min (%): ", validate_percentage, "Target Range Min")
         target_range_max = get_validated_input("Target Range Max (%): ", validate_percentage, "Target Range Max")
         
-        # GPS coordinates
         print("GPS Coordinates (Rotterdam region, 5 decimal places):")
         latitude = get_validated_input("Latitude (51.80000-52.10000): ", lambda x: validate_gps_coordinates(x, "4.50000")[0], x)
         longitude = get_validated_input("Longitude (4.20000-4.80000): ", lambda x: validate_gps_coordinates("51.90000", x)[0], x)
@@ -409,10 +372,9 @@ def add_scooter_ui():
         last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ").strip()
         
         if last_maintenance and not validate_date(last_maintenance, "Last Maintenance Date")[0]:
-            print("❌ Invalid maintenance date format.")
+            print("Invalid maintenance date format.")
             return
-        
-        # Create scooter data
+
         scooter_data = {
             'brand': brand,
             'model': model,
@@ -428,20 +390,18 @@ def add_scooter_ui():
             'last_maintenance_date': last_maintenance if last_maintenance else None
         }
         
-        # Create scooter
         create_scooter(scooter_data)
-        print("✅ Scooter added successfully!")
+        print("Scooter added successfully!")
         
     except ValueError as e:
-        print(f"❌ {str(e)}")
+        print(f"{str(e)}")
     except KeyboardInterrupt:
         print("\nScooter creation cancelled.")
     except Exception as e:
-        print(f"❌ Error creating scooter: {str(e)}")
+        print(f"Error creating scooter: {str(e)}")
 
 
 def search_scooters_ui():
-    """Search scooters"""
     print_sub_header("Search Scooters")
     
     try:
@@ -473,15 +433,13 @@ def search_scooters_ui():
     except KeyboardInterrupt:
         print("\nSearch cancelled.")
     except Exception as e:
-        print(f"❌ Error searching scooters: {str(e)}")
+        print(f"Error searching scooters: {str(e)}")
 
 
 def update_scooter_ui():
-    """Update scooter information based on user role"""
     print_sub_header("Update Scooter")
     
     try:
-        # First search for the scooter
         search_term = get_validated_input("Search for scooter to update: ", validate_search_term)
         results = search_scooters(search_term)
         
@@ -499,24 +457,20 @@ def update_scooter_ui():
         else:
             scooter_id = results[0]['id']
         
-        # Get full scooter details
         scooter = get_scooter_by_id(int(scooter_id))
         if not scooter:
-            print("❌ Scooter not found.")
+            print("Scooter not found.")
             return
         
         print(f"\nUpdating scooter: {scooter['brand']} {scooter['model']} ({scooter['serial_number']})")
-        
-        # Service Engineers can only update certain fields
+
         if current_user["role"] == "service_engineer":
             print("Service Engineers can update: State of Charge, Target Range, Location, Out-of-Service Status, Mileage, Last Maintenance Date")
         
         print("Enter new values (press Enter to keep current):")
         
-        # Collect updates based on role permissions
         updates = {}
         
-        # Fields that Service Engineers can update
         new_soc = input(f"State of Charge % [{scooter['state_of_charge']}]: ").strip()
         if new_soc and validate_percentage(new_soc)[0]:
             updates['state_of_charge'] = int(new_soc)
@@ -527,8 +481,8 @@ def update_scooter_ui():
             updates['latitude'] = float(new_lat)
             updates['longitude'] = float(new_lng)
         
-        # Fields only Super Admin and System Admin can update
-        if current_user["role"] in ["super_admin", "system_admin"]:
+        # @pablosanderman volgens mij is hier nog extra validatie nodig dat de user ook echt de role heeft, is al functie voor maar wordt hier vgm niet gebruikt
+        if current_user["role"] in ["super_admin", "system_admin"]: 
             new_brand = input(f"Brand [{scooter['brand']}]: ").strip()
             if new_brand and validate_name(new_brand)[0]:
                 updates['brand'] = new_brand
@@ -537,27 +491,24 @@ def update_scooter_ui():
             if new_model and validate_name(new_model)[0]:
                 updates['model'] = new_model
         
-        # Apply updates
         if updates:
             if update_scooter(scooter['id'], **updates):
-                print("✅ Scooter updated successfully!")
+                print("Scooter updated successfully!")
             else:
-                print("❌ Failed to update scooter.")
+                print("Failed to update scooter.")
         else:
             print("No changes made.")
             
     except KeyboardInterrupt:
         print("\nUpdate cancelled.")
     except Exception as e:
-        print(f"❌ Error updating scooter: {str(e)}")
+        print(f"Error updating scooter: {str(e)}")
 
 
 def delete_scooter_ui():
-    """Delete scooter with confirmation"""
     print_sub_header("Delete Scooter")
     
     try:
-        # Search for scooter
         search_term = get_validated_input("Search for scooter to delete: ", validate_search_term)
         results = search_scooters(search_term)
         
@@ -575,13 +526,11 @@ def delete_scooter_ui():
         else:
             scooter_id = results[0]['id']
         
-        # Get full details for confirmation
         scooter = get_scooter_by_id(int(scooter_id))
         if not scooter:
-            print("❌ Scooter not found.")
+            print("Scooter not found.")
             return
         
-        # Confirm deletion
         print(f"\nScooter to delete:")
         print(f"Brand/Model: {scooter['brand']} {scooter['model']}")
         print(f"Serial Number: {scooter['serial_number']}")
@@ -590,20 +539,19 @@ def delete_scooter_ui():
         
         if confirm == 'yes':
             if delete_scooter(scooter['id']):
-                print("✅ Scooter deleted successfully!")
+                print("Scooter deleted successfully!")
             else:
-                print("❌ Failed to delete scooter.")
+                print("Failed to delete scooter.")
         else:
             print("Deletion cancelled.")
             
     except KeyboardInterrupt:
         print("\nDeletion cancelled.")
     except Exception as e:
-        print(f"❌ Error deleting scooter: {str(e)}")
+        print(f"Error deleting scooter: {str(e)}")
 
 
 def create_backup_ui():
-    """Create system backup"""
     print_sub_header("Create System Backup")
     
     try:
@@ -611,16 +559,15 @@ def create_backup_ui():
         backup_filename = create_backup()
         
         if backup_filename:
-            print(f"✅ Backup created successfully: {backup_filename}")
+            print(f"Backup created successfully: {backup_filename}")
         else:
-            print("❌ Failed to create backup.")
+            print("Failed to create backup.")
             
     except Exception as e:
-        print(f"❌ Error creating backup: {str(e)}")
+        print(f"Error creating backup: {str(e)}")
 
 
 def list_backups_ui():
-    """List available backups"""
     print_sub_header("Available Backups")
     
     try:
@@ -643,11 +590,10 @@ def list_backups_ui():
         print(create_display_table(headers, rows))
         
     except Exception as e:
-        print(f"❌ Error listing backups: {str(e)}")
+        print(f"Error listing backups: {str(e)}")
 
 
 def restore_backup_ui():
-    """Restore from backup (Super Admin only)"""
     print_sub_header("Restore from Backup")
     
     try:
@@ -657,7 +603,6 @@ def restore_backup_ui():
             print("No backups available.")
             return
         
-        # Show available backups
         print("Available backups:")
         for i, backup in enumerate(backups, 1):
             print(f"{i}. {backup['filename']} ({backup['created'][:19].replace('T', ' ')})")
@@ -665,30 +610,27 @@ def restore_backup_ui():
         choice = get_validated_input(f"Select backup (1-{len(backups)}): ", validate_positive_integer, "Choice", 1, len(backups))
         selected_backup = backups[int(choice) - 1]
         
-        # Confirm restore
         print(f"\nWarning: This will replace the current system with backup: {selected_backup['filename']}")
         confirm = input("Are you sure you want to continue? (yes/no): ").lower()
         
         if confirm == 'yes':
             if restore_backup(selected_backup['filename']):
-                print("✅ System restored successfully!")
+                print("System restored successfully!")
             else:
-                print("❌ Failed to restore system.")
+                print("Failed to restore system.")
         else:
             print("Restore cancelled.")
             
     except KeyboardInterrupt:
         print("\nRestore cancelled.")
     except Exception as e:
-        print(f"❌ Error restoring backup: {str(e)}")
+        print(f"Error restoring backup: {str(e)}")
 
 
 def generate_restore_code_ui():
-    """Generate restore code for System Administrator"""
     print_sub_header("Generate Restore Code")
     
     try:
-        # Show System Administrators
         users = get_all_users()
         sys_admins = [u for u in users if u['role'] == 'system_admin']
         
@@ -703,7 +645,6 @@ def generate_restore_code_ui():
         admin_choice = get_validated_input(f"Select administrator (1-{len(sys_admins)}): ", validate_positive_integer, "Choice", 1, len(sys_admins))
         selected_admin = sys_admins[int(admin_choice) - 1]
         
-        # Show available backups
         backups = list_backups()
         if not backups:
             print("No backups available.")
@@ -716,10 +657,9 @@ def generate_restore_code_ui():
         backup_choice = get_validated_input(f"Select backup (1-{len(backups)}): ", validate_positive_integer, "Choice", 1, len(backups))
         selected_backup = backups[int(backup_choice) - 1]
         
-        # Generate code
         code = generate_restore_code_for_admin(selected_admin['username'], selected_backup['filename'])
         
-        print(f"\n✅ Restore code generated: {code}")
+        print(f"\nRestore code generated: {code}")
         print(f"Administrator: {selected_admin['username']}")
         print(f"Backup: {selected_backup['filename']}")
         print("This code can only be used once by the specified administrator.")
@@ -727,11 +667,10 @@ def generate_restore_code_ui():
     except KeyboardInterrupt:
         print("\nCode generation cancelled.")
     except Exception as e:
-        print(f"❌ Error generating restore code: {str(e)}")
+        print(f"Error generating restore code: {str(e)}")
 
 
 def list_restore_codes_ui():
-    """List active restore codes"""
     print_sub_header("Active Restore Codes")
     
     try:
@@ -755,11 +694,10 @@ def list_restore_codes_ui():
         print(create_display_table(headers, rows))
         
     except Exception as e:
-        print(f"❌ Error listing restore codes: {str(e)}")
+        print(f"Error listing restore codes: {str(e)}")
 
 
 def revoke_restore_code_ui():
-    """Revoke restore code"""
     print_sub_header("Revoke Restore Code")
     
     try:
@@ -769,7 +707,6 @@ def revoke_restore_code_ui():
             print("No active restore codes to revoke.")
             return
         
-        # Show active codes
         print("Active restore codes:")
         for i, code_info in enumerate(codes, 1):
             print(f"{i}. {code_info['code']} (Admin: {code_info['admin_username']}, Backup: {code_info['backup_file']})")
@@ -777,50 +714,46 @@ def revoke_restore_code_ui():
         choice = get_validated_input(f"Select code to revoke (1-{len(codes)}): ", validate_positive_integer, "Choice", 1, len(codes))
         selected_code = codes[int(choice) - 1]
         
-        # Confirm revocation
         confirm = input(f"Revoke code {selected_code['code']}? (yes/no): ").lower()
         
         if confirm == 'yes':
             if revoke_restore_code(selected_code['code']):
-                print("✅ Restore code revoked successfully!")
+                print("Restore code revoked successfully!")
             else:
-                print("❌ Failed to revoke restore code.")
+                print("Failed to revoke restore code.")
         else:
             print("Revocation cancelled.")
             
     except KeyboardInterrupt:
         print("\nRevocation cancelled.")
     except Exception as e:
-        print(f"❌ Error revoking restore code: {str(e)}")
+        print(f"Error revoking restore code: {str(e)}")
 
 
 def use_restore_code_ui():
-    """Use restore code (System Admin only)"""
     print_sub_header("Use Restore Code")
     
     try:
         code = input("Enter restore code: ").strip().upper()
         
         if not code:
-            print("❌ Restore code cannot be empty.")
+            print("Restore code cannot be empty.")
             return
         
-        # Use the code
         success, message = use_restore_code(code, current_user["username"])
         
         if success:
-            print(f"✅ {message}")
+            print(f"{message}")
         else:
-            print(f"❌ {message}")
+            print(f"{message}")
             
     except KeyboardInterrupt:
         print("\nRestore cancelled.")
     except Exception as e:
-        print(f"❌ Error using restore code: {str(e)}")
+        print(f"Error using restore code: {str(e)}")
 
 
 def view_logs_ui(suspicious_only=False):
-    """View system logs"""
     log_type = "Suspicious Activities" if suspicious_only else "System Logs"
     print_sub_header(f"View {log_type}")
     
@@ -846,7 +779,6 @@ def view_logs_ui(suspicious_only=False):
         print(f"Recent {log_type} (showing last {len(logs)} entries):")
         print(create_display_table(headers, rows))
         
-        # Show detailed view option
         if logs:
             choice = input("\nView details for a specific log entry? (Enter log number or press Enter to continue): ").strip()
             if choice and choice.isdigit():
@@ -860,7 +792,7 @@ def view_logs_ui(suspicious_only=False):
                     print(f"Additional Info: {selected_log['additional_info']}")
                     print(f"Suspicious: {'Yes' if selected_log['suspicious'] else 'No'}")
                 else:
-                    print("❌ Log entry not found.")
+                    print("Log entry not found.")
         
     except Exception as e:
-        print(f"❌ Error viewing logs: {str(e)}") 
+        print(f"Error viewing logs: {str(e)}") 

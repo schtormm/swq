@@ -1,16 +1,13 @@
-"""
-Urban Mobility Backend System - User Interface Module
-Console-based interface with role-specific menus and operations
-"""
-
-from um_auth import current_user, logout, require_role, can_manage_role, can_access_logs
-from um_auth import can_backup_restore, can_manage_travellers, can_manage_scooters, can_add_delete_scooters
-from um_utils import print_header, print_sub_header, print_separator, create_display_table
-from um_ui_operations import *
+# views voor menu's
+from auth import (can_access_logs, can_add_delete_scooters, can_backup_restore,
+                  can_manage_role, can_manage_scooters, can_manage_travellers,
+                  current_user, logout, require_role)
+from ui_functions import *
+from utils import (create_display_table, print_header, print_separator,
+                   print_sub_header)
 
 
 def display_main_menu():
-    """Display appropriate menu based on user role"""
     role = current_user["role"]
     
     if role == "super_admin":
@@ -20,12 +17,11 @@ def display_main_menu():
     elif role == "service_engineer":
         service_engineer_menu()
     else:
-        print("❌ Unknown role. Please contact administrator.")
+        print("Unknown role. Please contact administrator.")
         logout()
 
 
 def super_admin_menu():
-    """Super Administrator main menu"""
     while True:
         print_header("Super Administrator Menu")
         print(f"Logged in as: {current_user['username']}")
@@ -60,13 +56,12 @@ def super_admin_menu():
             logout()
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         input("\nPress Enter to continue...")
 
 
 def system_admin_menu():
-    """System Administrator main menu"""
     while True:
         print_header("System Administrator Menu")
         print(f"Logged in as: {current_user['username']}")
@@ -98,13 +93,12 @@ def system_admin_menu():
             logout()
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         input("\nPress Enter to continue...")
 
 
 def service_engineer_menu():
-    """Service Engineer main menu"""
     while True:
         print_header("Service Engineer Menu")
         print(f"Logged in as: {current_user['username']}")
@@ -127,13 +121,12 @@ def service_engineer_menu():
             logout()
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         input("\nPress Enter to continue...")
 
 
 def manage_users_menu(user_role):
-    """Manage users submenu"""
     role_name = "System Administrator" if user_role == "system_admin" else "Service Engineer"
     
     while True:
@@ -161,14 +154,13 @@ def manage_users_menu(user_role):
         elif choice == "6":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "6":
             input("\nPress Enter to continue...")
 
 
 def manage_travellers_menu():
-    """Manage travellers submenu"""
     while True:
         print_header("Manage Travellers")
         print("1. Add New Traveller")
@@ -191,14 +183,13 @@ def manage_travellers_menu():
         elif choice == "5":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "5":
             input("\nPress Enter to continue...")
 
 
 def manage_scooters_menu():
-    """Manage scooters submenu"""
     while True:
         print_header("Manage Scooters")
         print("1. Add New Scooter")
@@ -214,7 +205,7 @@ def manage_scooters_menu():
             if can_add_delete_scooters():
                 add_scooter_ui()
             else:
-                print("❌ Access denied: You cannot add scooters.")
+                print("Access denied: You cannot add scooters.")
         elif choice == "2":
             search_scooters_ui()
         elif choice == "3":
@@ -223,18 +214,17 @@ def manage_scooters_menu():
             if can_add_delete_scooters():
                 delete_scooter_ui()
             else:
-                print("❌ Access denied: You cannot delete scooters.")
+                print("Access denied: You cannot delete scooters.")
         elif choice == "5":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "5":
             input("\nPress Enter to continue...")
 
 
 def backup_restore_menu():
-    """Backup and restore submenu"""
     while True:
         print_header("Backup & Restore")
         print("1. Create Backup")
@@ -256,22 +246,21 @@ def backup_restore_menu():
             if current_user["role"] == "super_admin":
                 restore_backup_ui()
             else:
-                print("❌ Access denied: System Administrators must use restore codes.")
+                print("Access denied: System Administrators must use restore codes.")
         elif choice == "4" and current_user["role"] == "system_admin":
             use_restore_code_ui()
         elif choice == "5":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "5":
             input("\nPress Enter to continue...")
 
 
 def generate_restore_codes_menu():
-    """Generate restore codes submenu (Super Admin only)"""
     if current_user["role"] != "super_admin":
-        print("❌ Access denied: Only Super Administrator can generate restore codes.")
+        print("Access denied: Only Super Administrator can generate restore codes.")
         return
         
     while True:
@@ -293,14 +282,13 @@ def generate_restore_codes_menu():
         elif choice == "4":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "4":
             input("\nPress Enter to continue...")
 
 
 def view_logs_menu():
-    """View system logs submenu"""
     while True:
         print_header("System Logs")
         print("1. View Recent Logs")
@@ -317,51 +305,46 @@ def view_logs_menu():
         elif choice == "3":
             break
         else:
-            print("❌ Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
         
         if choice != "3":
             input("\nPress Enter to continue...")
 
 
 def update_own_password():
-    """Allow user to update their own password"""
     print_sub_header("Update Password")
     
     try:
-        from um_validation import get_validated_input, validate_password
-        from um_database import update_user_password
-        
-        # Get new password with validation
+        from database import update_user_password
+        from validation import get_validated_input, validate_password
+
         new_password = get_validated_input(
             "Enter new password: ",
             validate_password
         )
         
-        # Confirm password
         confirm_password = input("Confirm new password: ")
         
         if new_password != confirm_password:
-            print("❌ Passwords do not match.")
+            print("Passwords do not match.")
             return
         
-        # Update password
         if update_user_password(current_user["username"], new_password):
-            print("✅ Password updated successfully.")
+            print("Password updated successfully.")
         else:
-            print("❌ Failed to update password.")
+            print("Failed to update password.")
             
     except KeyboardInterrupt:
         print("\nPassword update cancelled.")
     except Exception as e:
-        print(f"❌ Error updating password: {str(e)}")
+        print(f"Error updating password: {str(e)}")
 
 
 def main_menu_wrapper():
-    """Wrapper for main menu with error handling"""
     try:
         display_main_menu()
     except KeyboardInterrupt:
         print("\nReturning to main menu...")
     except Exception as e:
-        print(f"❌ An error occurred: {str(e)}")
+        print(f"An error occurred: {str(e)}")
         print("Returning to main menu...") 

@@ -1,36 +1,27 @@
 #!/usr/bin/env python3
-"""
-Urban Mobility Backend System
-Main entry point for the console-based interface
-"""
-
+# main deel van de applicatie
 import os
 import sys
 from datetime import datetime
 
-# Import our modules
-from um_auth import login, logout, current_user, initialize_hard_coded_super_admin
-from um_database import initialize_database, check_suspicious_logs_alert
-from um_ui import display_main_menu
-from um_utils import print_header, print_separator
-from um_encryption import initialize_encryption
+from auth import current_user, initialize_hard_coded_super_admin, login, logout
+from database import check_suspicious_logs_alert, initialize_database
+from encryption import initialize_encryption
+from utils import print_header, print_separator
+from view import display_main_menu
 
 
 def initialize_system():
-    """Initialize the Urban Mobility backend system"""
     print_header("Urban Mobility Backend System")
     print("Initializing system...")
     
     try:
-        # Initialize encryption keys
         initialize_encryption()
         print("✓ Encryption system initialized")
         
-        # Initialize database
         initialize_database()
         print("✓ Database initialized")
-        
-        # Initialize hard-coded super administrator
+ 
         initialize_hard_coded_super_admin()
         print("✓ Super Administrator account ready")
         
@@ -38,7 +29,7 @@ def initialize_system():
         print_separator()
         
     except Exception as e:
-        print(f"❌ System initialization failed: {str(e)}")
+        print(f"System initialization failed: {str(e)}")
         sys.exit(1)
 
 
@@ -53,17 +44,14 @@ def main():
     while True:
         try:
             if current_user["username"] is None:
-                # User is not logged in
                 print("\nPlease login to continue:")
                 if login():
-                    # Check for suspicious activities alert after login
                     if current_user["role"] in ["super_admin", "system_admin"]:
                         check_suspicious_logs_alert()
                     continue
                 else:
                     print("Login failed. Please try again.")
             else:
-                # User is logged in - display appropriate menu
                 display_main_menu()
                 
         except KeyboardInterrupt:
