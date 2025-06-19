@@ -7,7 +7,7 @@ from datetime import datetime
 from auth import (current_user, initialize_hard_coded_super_admin, login,
                   logout, require_role)
 from database import check_suspicious_logs_alert, initialize_database
-from encryption import initialize_encryption
+from encryption import initialize_encryption, is_encryption_initialized
 from utils import print_header, print_separator
 from view import display_main_menu
 
@@ -41,27 +41,27 @@ def main():
     print("Welcome to Urban Mobility Backend System")
     print("Super Administrator credentials: super_admin / Admin_123?")
     print_separator()
-    
-    while True:
-        try:
-            if current_user["username"] is None:
-                print("\nPlease login to continue:")
-                if login():
-                    if require_role("super_admin" or "system_admin"):
-                        check_suspicious_logs_alert()
-                    continue
+    if is_encryption_initialized():
+        while True:
+            try:
+                if current_user["username"] is None:
+                    print("\nPlease login to continue:")
+                    if login():
+                        if require_role("super_admin" or "system_admin"):
+                            check_suspicious_logs_alert()
+                        continue
+                    else:
+                        print("Login failed. Please try again.")
                 else:
-                    print("Login failed. Please try again.")
-            else:
-                display_main_menu()
-                
-        except KeyboardInterrupt:
-            print("\n\nShutting down Urban Mobility Backend System...")
-            logout()
-            break
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            print("Please try again or contact system administrator.")
+                    display_main_menu()
+                    
+            except KeyboardInterrupt:
+                print("\n\nShutting down Urban Mobility Backend System...")
+                logout()
+                break
+            except Exception as e:
+                print(f"An error occurred: {str(e)}")
+                print("Please try again or contact system administrator.")
 
 
 if __name__ == "__main__":

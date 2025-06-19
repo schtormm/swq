@@ -115,15 +115,6 @@ def truncate_text(text, max_length=50):
         return text_str
     return text_str[:max_length-3] + "..."
 
-#wordt nog nergens gebruikt?? 
-def format_search_results(results, result_type="items"):
-    if not results:
-        return f"No {result_type} found matching your search criteria."
-    
-    count = len(results)
-    return f"Found {count} {result_type}{'s' if count != 1 else ''} matching your search:"
-
-
 def get_cities_list():
     return [
         "Rotterdam", "Amsterdam", "Utrecht", "The Hague", "Eindhoven",

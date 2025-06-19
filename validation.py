@@ -61,14 +61,6 @@ def is_valid_length(input_str, min_length=None, max_length=None):
     max_ok = max_length is None or length <= max_length
     return min_ok and max_ok
 
-
-def matches_whitelist_pattern(input_str, pattern):
-    return (input_str and 
-            isinstance(input_str, str) and 
-            is_safe_string(input_str) and 
-            re.fullmatch(pattern, input_str) is not None)
-
-
 def validate_username(username):
     if (username and 
         isinstance(username, str) and 
