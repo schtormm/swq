@@ -4,7 +4,8 @@ import os
 import sys
 from datetime import datetime
 
-from auth import current_user, initialize_hard_coded_super_admin, login, logout
+from auth import (current_user, initialize_hard_coded_super_admin, login,
+                  logout, require_role)
 from database import check_suspicious_logs_alert, initialize_database
 from encryption import initialize_encryption
 from utils import print_header, print_separator
@@ -46,7 +47,7 @@ def main():
             if current_user["username"] is None:
                 print("\nPlease login to continue:")
                 if login():
-                    if current_user["role"] in ["super_admin", "system_admin"]:
+                    if require_role("super_admin" or "system_admin"):
                         check_suspicious_logs_alert()
                     continue
                 else:
