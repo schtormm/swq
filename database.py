@@ -475,7 +475,6 @@ def create_scooter(scooter_data):
         in_service_date = datetime.now().isoformat()
         encrypted_in_service_date = encrypt_data(in_service_date)
         
-        # Encrypt sensitive scooter data
         encrypted_data = {
             'brand': encrypt_data(scooter_data['brand']),
             'model': encrypt_data(scooter_data['model']),
@@ -491,7 +490,6 @@ def create_scooter(scooter_data):
             'last_maintenance_date': encrypt_data(scooter_data.get('last_maintenance_date', ''))
         }
         
-        # Keep search_index unencrypted for searching functionality
         search_index = f"{scooter_data['brand']} {scooter_data['model']} {scooter_data['serial_number']}".lower()
         
         with closing(get_db_connection()) as conn:
@@ -539,7 +537,6 @@ def search_scooters(search_term):
             
             results = []
             for row in rows:
-                # Decrypt the sensitive scooter data
                 results.append({
                     'id': row['id'],
                     'brand': decrypt_data(row['brand']),
@@ -563,7 +560,6 @@ def get_scooter_by_id(scooter_id):
             row = cursor.fetchone()
             
             if row:
-                # Decrypt all sensitive scooter data
                 return {
                     'id': row['id'],
                     'brand': decrypt_data(row['brand']),
@@ -598,7 +594,6 @@ def update_scooter(scooter_id, **kwargs):
         updates = []
         values = []
         
-
         for field, value in kwargs.items():
             if field in valid_fields and value is not None:
                 if field != 'out_of_service':
@@ -611,7 +606,6 @@ def update_scooter(scooter_id, **kwargs):
         if not updates:
             return False
             
-
         if any(field in ['brand', 'model', 'serial_number'] for field in kwargs.keys()):
             scooter = get_scooter_by_id(scooter_id)
             if scooter:
@@ -623,7 +617,6 @@ def update_scooter(scooter_id, **kwargs):
         
         values.append(scooter_id)
         
-
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
             query = f"UPDATE scooters SET {', '.join(updates)} WHERE id = ?"
@@ -638,7 +631,6 @@ def update_scooter(scooter_id, **kwargs):
                     suspicious=False
                 )
                 return True
-            
             
             return False
             
