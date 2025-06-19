@@ -15,3 +15,4 @@ backups/
 *.log
 um_system.log
 
+.vscode/settings.json
