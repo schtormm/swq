@@ -228,7 +228,7 @@ def delete_user(username):
                 log_event(
                     username="system",
                     description="User account deleted",
-                    additional_info=f"Username: {username}",
+                    additional_info=f"Username: {username} has been deleted",
                     suspicious=False
                 )
                 return True
@@ -828,11 +828,25 @@ def use_restore_code(code, admin_username):
     global restore_codes
     
     if code not in restore_codes:
+        log_event(
+            username=admin_username,
+            description="Attempted to use invalid restore code",
+            additional_info=f"Code: {code}",
+            suspicious=True
+        )
         return False, "Invalid or expired restore code"
+    
     
     code_data = restore_codes[code]
     if code_data['admin_username'] != admin_username:
+        log_event(
+            username=admin_username,
+            description="Attempted to use restore code not issued for this admin",
+            additional_info=f"Code: {code}, Expected Admin: {code_data['admin_username']}",
+            suspicious=True
+        )
         return False, "Restore code not issued for this administrator"
+        
     
     backup_filename = code_data['backup_file']
     
