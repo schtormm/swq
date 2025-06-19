@@ -180,14 +180,14 @@ def add_traveller_ui():
         gender = get_validated_input("Gender (male/female): ", validate_gender)
         street_name = get_validated_input("Street Name: ", validate_name, "Street Name")
         house_number = get_validated_input("House Number: ", validate_positive_integer, "House Number", 1, 10000)
-        zip_code = get_validated_input("Zip Code (DDDDXX): ", validate_zip_code)
+        zip_code = get_validated_input("Zip Code (DDDDXX): ", validate_postcode)
         
         cities = get_cities_list()
         print(f"Available cities: {', '.join(cities)}")
         city = get_validated_input("City: ", validate_city)
         
         email = get_validated_input("Email: ", validate_email)
-        mobile_phone = get_validated_input("Mobile Phone (8 digits only): ", validate_mobile_phone)
+        mobile_phone = get_validated_input("Mobile Phone (8 digits only): ", validate_phone_number)
         driving_license = get_validated_input("Driving License (XXDDDDDDD or XDDDDDDDD): ", validate_driving_license)
         
         traveller_data = {
@@ -367,7 +367,6 @@ def add_scooter_ui():
         print("GPS Coordinates (Rotterdam region, 5 decimal places):")
         latitude = get_validated_input("Latitude (51.80000-52.10000): ", lambda x: validate_gps_coordinates(x, "4.50000")[0], x)
         longitude = get_validated_input("Longitude (4.20000-4.80000): ", lambda x: validate_gps_coordinates("51.90000", x)[0], x)
-        
         mileage = get_validated_input("Mileage (km): ", validate_positive_float, "Mileage", 0, 100000)
         last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ").strip()
         
@@ -480,6 +479,33 @@ def update_scooter_ui():
         if new_lat and new_lng and validate_gps_coordinates(new_lat, new_lng)[0]:
             updates['latitude'] = float(new_lat)
             updates['longitude'] = float(new_lng)
+
+        new_target_range_min = input(f"Target Range Min % [{scooter['target_range_min']}]: ").strip()
+        if new_target_range_min and validate_percentage(new_target_range_min)[0]:
+            updates['target_range_min'] = int(new_target_range_min)
+        
+        new_target_range_max = input(f"Target Range Max % [{scooter['target_range_max']}]: ").strip()
+        if new_target_range_max and validate_percentage(new_target_range_max)[0]:
+            updates['target_range_max'] = int(new_target_range_max)
+        
+        new_out_of_service = input(f"Out of Service (yes/no) [{scooter['out_of_service']}]: ").strip().lower()
+        if new_out_of_service in ['yes', 'no']:
+            updates['out_of_service'] = new_out_of_service == 'yes'
+        elif new_out_of_service:
+            print("Invalid input for Out of Service. Please enter 'yes' or 'no'.")
+            return
+        
+        new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ").strip()
+        if new_mileage and validate_positive_float(new_mileage, "Mileage", 0, 100000)[0]:
+            updates['mileage'] = float(new_mileage)
+        
+        new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ").strip()
+        if new_last_maintenance:
+            if validate_date(new_last_maintenance, "Last Maintenance Date")[0]:
+                updates['last_maintenance_date'] = new_last_maintenance
+            else:
+                print("Invalid date format for Last Maintenance Date.")
+                return
         
         # @pablosanderman volgens mij is hier nog extra validatie nodig dat de user ook echt de role heeft, is al functie voor maar wordt hier vgm niet gebruikt
         if current_user["role"] in ["super_admin", "system_admin"]: 
@@ -490,12 +516,39 @@ def update_scooter_ui():
             new_model = input(f"Model [{scooter['model']}]: ").strip()
             if new_model and validate_name(new_model)[0]:
                 updates['model'] = new_model
+
+            new_serial = input(f"Serial Number [{scooter['serial_number']}]: ").strip()
+            if new_serial and validate_scooter_serial(new_serial)[0]:
+                updates['serial_number'] = new_serial
+
+            new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ").strip()
+            if new_top_speed and validate_positive_integer(new_top_speed, "Top Speed")[0]:
+                updates['top_speed'] = int(new_top_speed)
+            
+            new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ").strip()
+            if new_battery_capacity and validate_positive_integer(new_battery_capacity, "Battery Capacity")[0]:
+                updates['battery_capacity'] = int(new_battery_capacity)
+        else:
+            print("You do not have permission to update brand, model, serial number, top speed, or battery capacity.")
+            log_event(username=current_user["username"],
+                      description=f"Attempted to update scooter {scooter['serial_number']} with ID {scooter['id']} without sufficient permissions.",
+                        additional_info=str(updates),
+                        suspicious=True) 
         
         if updates:
             if update_scooter(scooter['id'], **updates):
                 print("Scooter updated successfully!")
+                log_event(username=current_user["username"],
+                          description=f"Updated scooter {scooter['serial_number']} with ID {scooter['id']}.",
+                          additional_info=str(updates),
+                          suspicious=False)
+            
             else:
                 print("Failed to update scooter.")
+                log_event(username=current_user["username"],
+                          description=f"Failed to update scooter {scooter['serial_number']} with ID {scooter['id']}.",
+                          additional_info=str(updates),
+                          suspicious=True)
         else:
             print("No changes made.")
             
