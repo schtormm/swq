@@ -117,7 +117,7 @@ def validate_email(email):
         return False, "Email must be 5-100 characters in valid format with allowed characters only"
 
 
-def validate_mobile_phone(phone):
+def validate_phone_number(phone):
     if (phone and 
         isinstance(phone, str) and 
         is_safe_string(phone) and 
@@ -127,11 +127,11 @@ def validate_mobile_phone(phone):
         return False, "Mobile phone must be exactly 8 digits"
 
 
-def validate_zip_code(zip_code):
-    if (zip_code and 
-        isinstance(zip_code, str) and 
-        is_safe_string(zip_code) and 
-        re.fullmatch(ZIP_CODE_PATTERN, zip_code)):
+def validate_postcode(postcode):
+    if (postcode and 
+        isinstance(postcode, str) and 
+        is_safe_string(postcode) and 
+        re.fullmatch(ZIP_CODE_PATTERN, postcode)):
         return True, ""
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
