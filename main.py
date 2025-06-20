@@ -17,29 +17,29 @@ def seed_default_users():
     print("Seeding default users...")
     
     try:
-        existing_system_admin = get_user_by_username("system_admin")
+        existing_system_admin = get_user_by_username("sys_admin")
         if not existing_system_admin:
             create_user(
-                username="system_admin",
+                username="sys_admin",
                 password="SysAdmin_456!",
                 first_name="System",
                 last_name="Administrator",
                 role="system_admin"
             )
-            print("✓ System Administrator account created: system_admin")
+            print("✓ System Administrator account created: sys_admin")
         else:
             print("✓ System Administrator account already exists")
         
-        existing_service_engineer = get_user_by_username("service_engineer")
+        existing_service_engineer = get_user_by_username("svc_eng01")
         if not existing_service_engineer:
             create_user(
-                username="service_engineer",
+                username="svc_eng01",
                 password="Engineer_789@",
                 first_name="Service",
                 last_name="Engineer",
                 role="service_engineer"  
             )
-            print("✓ Service Engineer account created: service_engineer")
+            print("✓ Service Engineer account created: svc_eng01")
         else:
             print("✓ Service Engineer account already exists")
             
