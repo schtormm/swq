@@ -20,7 +20,6 @@ restore_codes = {}  # {code: {admin_username: str, backup_file: str, created: da
 
 
 def get_db_connection():
-    """Get database connection with row factory for easier access"""
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     return conn
@@ -333,16 +332,11 @@ def create_traveller(traveller_data):
 
 
 def search_travellers(search_term):
-    """
-    Secure application-level search - decrypts all records in memory to search.
-    This is secure because no plaintext data is stored in the database.
-    """
     try:
         search_lower = search_term.lower().strip()
         
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
-            # Get all travellers (encrypted)
             cursor.execute('''
                 SELECT id, customer_id, first_name, last_name, email
                 FROM travellers 
@@ -352,13 +346,10 @@ def search_travellers(search_term):
             
             results = []
             for row in rows:
-                # Decrypt the searchable fields
                 first_name = decrypt_data(row['first_name'])
                 last_name = decrypt_data(row['last_name'])
                 email = decrypt_data(row['email'])
                 customer_id = str(row['customer_id'])
-                
-                # Search in decrypted data
                 if (search_lower in first_name.lower() or 
                     search_lower in last_name.lower() or 
                     search_lower in email.lower() or 
@@ -524,16 +515,11 @@ def create_scooter(scooter_data):
         raise Exception(f"Failed to create scooter: {str(e)}")
 
 def search_scooters(search_term):
-    """
-    Secure application-level search - decrypts all records in memory to search.
-    This is secure because no plaintext data is stored in the database.
-    """
     try:
         search_lower = search_term.lower().strip()
         
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
-            # Get all scooters (encrypted)
             cursor.execute('''
                 SELECT id, brand, model, serial_number, state_of_charge, out_of_service
                 FROM scooters 
@@ -543,12 +529,9 @@ def search_scooters(search_term):
             
             results = []
             for row in rows:
-                # Decrypt the searchable fields
                 brand = decrypt_data(row['brand'])
                 model = decrypt_data(row['model'])
                 serial_number = decrypt_data(row['serial_number'])
-                
-                # Search in decrypted data
                 if (search_lower in brand.lower() or 
                     search_lower in model.lower() or 
                     search_lower in serial_number.lower() or
@@ -899,10 +882,8 @@ def use_restore_code(code, admin_username):
     
     backup_filename = code_data['backup_file']
     
-    # Use the code (delete it)
     del restore_codes[code]
     
-    # Perform restore
     success = restore_backup(backup_filename)
     
     log_event(
