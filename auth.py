@@ -133,13 +133,13 @@ def login():
                 
         except KeyboardInterrupt:
             print("\nLogin cancelled.")
-            return False
+            exit()
         except Exception as e:
             print(f"Login error: {str(e)}")
             
             
-    print("Maximum login attempts exceeded.")
-    return False
+    print("Maximum login attempts exceeded. Try again in 10 minutes.")
+    exit()
 
 
 def logout():
