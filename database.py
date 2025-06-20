@@ -791,6 +791,13 @@ def restore_backup(backup_filename):
         
         current_backup = create_backup()
         
+        # remove old database and log files
+        if os.path.exists(DB_FILE):
+            os.remove(DB_FILE)
+        if os.path.exists(LOG_FILE):
+            os.remove(LOG_FILE)
+        
+        
         with zipfile.ZipFile(backup_path, 'r') as zipf:
             zipf.extract("database.db", ".")
             os.rename("database.db", DB_FILE)
