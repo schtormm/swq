@@ -183,7 +183,7 @@ def add_traveller_ui():
         zip_code = get_validated_input("Zip Code (DDDDXX): ", validate_postcode)
         
         cities = get_cities_list()
-        print(f"Available cities: {', '.join(cities)}")
+        print(f"Available cities: {', '.join(sorted(cities))}")
         city = get_validated_input("City: ", validate_city)
         
         email = get_validated_input("Email: ", validate_email)
