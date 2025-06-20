@@ -365,8 +365,8 @@ def add_scooter_ui():
         target_range_max = get_validated_input("Target Range Max (%): ", validate_percentage, "Target Range Max")
         
         print("GPS Coordinates (Rotterdam region, 5 decimal places):")
-        latitude = get_validated_input("Latitude (51.80000-52.10000): ", lambda x: validate_gps_coordinates(x, "4.50000")[0], x)
-        longitude = get_validated_input("Longitude (4.20000-4.80000): ", lambda x: validate_gps_coordinates("51.90000", x)[0], x)
+        latitude = get_validated_input("Latitude (51.80000-52.10000): ", lambda x: validate_gps_coordinates(x, "4.50000")[0])
+        longitude = get_validated_input("Longitude (4.20000-4.80000): ", lambda x: validate_gps_coordinates("51.90000", x)[0])
         mileage = get_validated_input("Mileage (km): ", validate_positive_float, "Mileage", 0, 100000)
         last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ").strip()
         
