@@ -61,7 +61,6 @@ def initialize_database():
                     mobile_phone TEXT NOT NULL,
                     driving_license TEXT NOT NULL,
                     registration_date TEXT NOT NULL,
-                    search_index TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
@@ -83,7 +82,6 @@ def initialize_database():
                     mileage REAL DEFAULT 0.0,
                     last_maintenance_date TEXT,
                     in_service_date TEXT NOT NULL,
-                    search_index TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
@@ -303,10 +301,6 @@ def create_traveller(traveller_data):
         for field in sensitive_fields:
             encrypted_data[field] = encrypt_data(traveller_data[field])
         
-        # ervoor zorgen dat je nog wel kan zoeken
-        search_index = f"{traveller_data['first_name']} {traveller_data['last_name']} " \
-                      f"{traveller_data['email']} {customer_id}".lower()
-        
         registration_date = datetime.now().isoformat()
         encrypted_reg_date = encrypt_data(registration_date)
         
@@ -315,15 +309,14 @@ def create_traveller(traveller_data):
             cursor.execute('''
                 INSERT INTO travellers (customer_id, first_name, last_name, birthday,
                                       gender, street_name, house_number, zip_code, city,
-                                      email, mobile_phone, driving_license, registration_date,
-                                      search_index)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                      email, mobile_phone, driving_license, registration_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (customer_id, encrypted_data['first_name'], encrypted_data['last_name'],
                   encrypted_data['birthday'], encrypted_data['gender'], 
                   encrypted_data['street_name'], encrypted_data['house_number'],
                   encrypted_data['zip_code'], encrypted_data['city'], 
                   encrypted_data['email'], encrypted_data['mobile_phone'],
-                  encrypted_data['driving_license'], encrypted_reg_date, search_index))
+                  encrypted_data['driving_license'], encrypted_reg_date))
             conn.commit()
             
         log_event(
@@ -340,26 +333,46 @@ def create_traveller(traveller_data):
 
 
 def search_travellers(search_term):
+    """
+    Secure application-level search - decrypts all records in memory to search.
+    This is secure because no plaintext data is stored in the database.
+    """
     try:
+        search_lower = search_term.lower().strip()
+        
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
+            # Get all travellers (encrypted)
             cursor.execute('''
                 SELECT id, customer_id, first_name, last_name, email
                 FROM travellers 
-                WHERE search_index LIKE ?
                 ORDER BY customer_id
-            ''', (f"%{search_term.lower()}%",))
+            ''')
             rows = cursor.fetchall()
             
             results = []
             for row in rows:
-                results.append({
-                    'id': row['id'],
-                    'customer_id': row['customer_id'],
-                    'first_name': decrypt_data(row['first_name']),
-                    'last_name': decrypt_data(row['last_name']),
-                    'email': decrypt_data(row['email'])
-                })
+                # Decrypt the searchable fields
+                first_name = decrypt_data(row['first_name'])
+                last_name = decrypt_data(row['last_name'])
+                email = decrypt_data(row['email'])
+                customer_id = str(row['customer_id'])
+                
+                # Search in decrypted data
+                if (search_lower in first_name.lower() or 
+                    search_lower in last_name.lower() or 
+                    search_lower in email.lower() or 
+                    search_lower in customer_id.lower() or
+                    search_lower in f"{first_name} {last_name}".lower()):
+                    
+                    results.append({
+                        'id': row['id'],
+                        'customer_id': row['customer_id'],
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'email': email
+                    })
+            
             return results
             
     except Exception as e:
@@ -414,17 +427,6 @@ def update_traveller(traveller_id, **kwargs):
         if not updates:
             return False
             
-        #search index opnieuw updaten
-        if any(field in ['first_name', 'last_name', 'email'] for field in kwargs.keys()):
-            traveller = get_traveller_by_id(traveller_id)
-            if traveller:
-                new_search_index = f"{kwargs.get('first_name', traveller['first_name'])} " \
-                                 f"{kwargs.get('last_name', traveller['last_name'])} " \
-                                 f"{kwargs.get('email', traveller['email'])} " \
-                                 f"{traveller['customer_id']}".lower()
-                updates.append("search_index = ?")
-                values.append(new_search_index)
-        
         values.append(traveller_id)
         
         with closing(get_db_connection()) as conn:
@@ -490,23 +492,21 @@ def create_scooter(scooter_data):
             'last_maintenance_date': encrypt_data(scooter_data.get('last_maintenance_date', ''))
         }
         
-        search_index = f"{scooter_data['brand']} {scooter_data['model']} {scooter_data['serial_number']}".lower()
-        
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO scooters (brand, model, serial_number, top_speed, battery_capacity,
                                     state_of_charge, target_range_min, target_range_max,
                                     latitude, longitude, out_of_service, mileage,
-                                    last_maintenance_date, in_service_date, search_index)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    last_maintenance_date, in_service_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (encrypted_data['brand'], encrypted_data['model'], encrypted_data['serial_number'],
                   encrypted_data['top_speed'], encrypted_data['battery_capacity'], 
                   encrypted_data['state_of_charge'], encrypted_data['target_range_min'],
                   encrypted_data['target_range_max'], encrypted_data['latitude'], 
                   encrypted_data['longitude'], scooter_data.get('out_of_service', 0),
                   encrypted_data['mileage'], encrypted_data['last_maintenance_date'],
-                  encrypted_in_service_date, search_index))
+                  encrypted_in_service_date))
             conn.commit()
             
         log_event(
@@ -524,27 +524,45 @@ def create_scooter(scooter_data):
         raise Exception(f"Failed to create scooter: {str(e)}")
 
 def search_scooters(search_term):
+    """
+    Secure application-level search - decrypts all records in memory to search.
+    This is secure because no plaintext data is stored in the database.
+    """
     try:
+        search_lower = search_term.lower().strip()
+        
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
+            # Get all scooters (encrypted)
             cursor.execute('''
                 SELECT id, brand, model, serial_number, state_of_charge, out_of_service
                 FROM scooters 
-                WHERE search_index LIKE ?
                 ORDER BY brand, model
-            ''', (f"%{search_term.lower()}%",))
+            ''')
             rows = cursor.fetchall()
             
             results = []
             for row in rows:
-                results.append({
-                    'id': row['id'],
-                    'brand': decrypt_data(row['brand']),
-                    'model': decrypt_data(row['model']),
-                    'serial_number': decrypt_data(row['serial_number']),
-                    'state_of_charge': int(decrypt_data(row['state_of_charge'])),
-                    'out_of_service': bool(row['out_of_service'])
-                })
+                # Decrypt the searchable fields
+                brand = decrypt_data(row['brand'])
+                model = decrypt_data(row['model'])
+                serial_number = decrypt_data(row['serial_number'])
+                
+                # Search in decrypted data
+                if (search_lower in brand.lower() or 
+                    search_lower in model.lower() or 
+                    search_lower in serial_number.lower() or
+                    search_lower in f"{brand} {model}".lower()):
+                    
+                    results.append({
+                        'id': row['id'],
+                        'brand': brand,
+                        'model': model,
+                        'serial_number': serial_number,
+                        'state_of_charge': int(decrypt_data(row['state_of_charge'])),
+                        'out_of_service': bool(row['out_of_service'])
+                    })
+            
             return results
             
     except Exception as e:
@@ -575,8 +593,7 @@ def get_scooter_by_id(scooter_id):
                     'out_of_service': bool(row['out_of_service']),
                     'mileage': float(decrypt_data(row['mileage'])),
                     'last_maintenance_date': decrypt_data(row['last_maintenance_date']),
-                    'in_service_date': decrypt_data(row['in_service_date']),
-                    'search_index': row['search_index']  # Not encrypted
+                    'in_service_date': decrypt_data(row['in_service_date'])
                 }
             return None
             
@@ -606,15 +623,6 @@ def update_scooter(scooter_id, **kwargs):
         if not updates:
             return False
             
-        if any(field in ['brand', 'model', 'serial_number'] for field in kwargs.keys()):
-            scooter = get_scooter_by_id(scooter_id)
-            if scooter:
-                new_search_index = f"{kwargs.get('brand', scooter['brand'])} " \
-                                 f"{kwargs.get('model', scooter['model'])} " \
-                                 f"{kwargs.get('serial_number', scooter['serial_number'])}".lower()
-                updates.append("search_index = ?")
-                values.append(new_search_index)
-        
         values.append(scooter_id)
         
         with closing(get_db_connection()) as conn:
