@@ -11,13 +11,10 @@ from utils import (create_display_table, print_header, print_separator,
 def display_main_menu():
     match current_user["role"]:
         case "super_admin":
-            if check_permission("super_admin"):
                 super_admin_menu()
         case "system_admin":
-            if check_permission("system_admin"):
                 system_admin_menu()
         case "service_engineer":
-            if check_permission("service_engineer"):
                 service_engineer_menu()
         case default:
             print("Unknown role. Please contact administrator.")
