@@ -1,24 +1,24 @@
 # views voor menu's
 from auth import (can_access_logs, can_add_delete_scooters, can_backup_restore,
                   can_manage_role, can_manage_scooters, can_manage_travellers,
-                  current_user, logout, require_role)
+                  check_permission, current_user, has_role, logout,
+                  require_role)
 from ui_functions import *
 from utils import (create_display_table, print_header, print_separator,
                    print_sub_header)
 
 
 def display_main_menu():
-    role = current_user["role"]
-    
-    if role == "super_admin":
-        super_admin_menu()
-    elif role == "system_admin":
-        system_admin_menu()
-    elif role == "service_engineer":
-        service_engineer_menu()
-    else:
-        print("Unknown role. Please contact administrator.")
-        logout()
+    match current_user["role"]:
+        case "super_admin":
+                super_admin_menu()
+        case "system_admin":
+                system_admin_menu()
+        case "service_engineer":
+                service_engineer_menu()
+        case default:
+            print("Unknown role. Please contact administrator.")
+            logout()
 
 
 def super_admin_menu():
@@ -338,13 +338,3 @@ def update_own_password():
         print("\nPassword update cancelled.")
     except Exception as e:
         print(f"Error updating password: {str(e)}")
-
-
-def main_menu_wrapper():
-    try:
-        display_main_menu()
-    except KeyboardInterrupt:
-        print("\nReturning to main menu...")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        print("Returning to main menu...") 

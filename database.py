@@ -228,7 +228,7 @@ def delete_user(username):
                 log_event(
                     username="system",
                     description="User account deleted",
-                    additional_info=f"Username: {username}",
+                    additional_info=f"Username: {username} has been deleted",
                     suspicious=False
                 )
                 return True
@@ -473,9 +473,24 @@ def delete_traveller(traveller_id):
 def create_scooter(scooter_data):
     try:
         in_service_date = datetime.now().isoformat()
+        encrypted_in_service_date = encrypt_data(in_service_date)
         
-        search_index = f"{scooter_data['brand']} {scooter_data['model']} " \
-                      f"{scooter_data['serial_number']}".lower()
+        encrypted_data = {
+            'brand': encrypt_data(scooter_data['brand']),
+            'model': encrypt_data(scooter_data['model']),
+            'serial_number': encrypt_data(scooter_data['serial_number']),
+            'top_speed': encrypt_data(str(scooter_data['top_speed'])),
+            'battery_capacity': encrypt_data(str(scooter_data['battery_capacity'])),
+            'state_of_charge': encrypt_data(str(scooter_data['state_of_charge'])),
+            'target_range_min': encrypt_data(str(scooter_data['target_range_min'])),
+            'target_range_max': encrypt_data(str(scooter_data['target_range_max'])),
+            'latitude': encrypt_data(str(scooter_data['latitude'])),
+            'longitude': encrypt_data(str(scooter_data['longitude'])),
+            'mileage': encrypt_data(str(scooter_data.get('mileage', 0.0))),
+            'last_maintenance_date': encrypt_data(scooter_data.get('last_maintenance_date', ''))
+        }
+        
+        search_index = f"{scooter_data['brand']} {scooter_data['model']} {scooter_data['serial_number']}".lower()
         
         with closing(get_db_connection()) as conn:
             cursor = conn.cursor()
@@ -485,13 +500,13 @@ def create_scooter(scooter_data):
                                     latitude, longitude, out_of_service, mileage,
                                     last_maintenance_date, in_service_date, search_index)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (scooter_data['brand'], scooter_data['model'], scooter_data['serial_number'],
-                  scooter_data['top_speed'], scooter_data['battery_capacity'], 
-                  scooter_data['state_of_charge'], scooter_data['target_range_min'],
-                  scooter_data['target_range_max'], scooter_data['latitude'], 
-                  scooter_data['longitude'], scooter_data.get('out_of_service', 0),
-                  scooter_data.get('mileage', 0.0), scooter_data.get('last_maintenance_date'),
-                  in_service_date, search_index))
+            ''', (encrypted_data['brand'], encrypted_data['model'], encrypted_data['serial_number'],
+                  encrypted_data['top_speed'], encrypted_data['battery_capacity'], 
+                  encrypted_data['state_of_charge'], encrypted_data['target_range_min'],
+                  encrypted_data['target_range_max'], encrypted_data['latitude'], 
+                  encrypted_data['longitude'], scooter_data.get('out_of_service', 0),
+                  encrypted_data['mileage'], encrypted_data['last_maintenance_date'],
+                  encrypted_in_service_date, search_index))
             conn.commit()
             
         log_event(
@@ -507,7 +522,6 @@ def create_scooter(scooter_data):
         raise ValueError("Serial number already exists")
     except Exception as e:
         raise Exception(f"Failed to create scooter: {str(e)}")
-
 
 def search_scooters(search_term):
     try:
@@ -525,10 +539,10 @@ def search_scooters(search_term):
             for row in rows:
                 results.append({
                     'id': row['id'],
-                    'brand': row['brand'],
-                    'model': row['model'],
-                    'serial_number': row['serial_number'],
-                    'state_of_charge': row['state_of_charge'],
+                    'brand': decrypt_data(row['brand']),
+                    'model': decrypt_data(row['model']),
+                    'serial_number': decrypt_data(row['serial_number']),
+                    'state_of_charge': int(decrypt_data(row['state_of_charge'])),
                     'out_of_service': bool(row['out_of_service'])
                 })
             return results
@@ -546,13 +560,29 @@ def get_scooter_by_id(scooter_id):
             row = cursor.fetchone()
             
             if row:
-                return dict(row)
+                return {
+                    'id': row['id'],
+                    'brand': decrypt_data(row['brand']),
+                    'model': decrypt_data(row['model']), 
+                    'serial_number': decrypt_data(row['serial_number']),
+                    'top_speed': float(decrypt_data(row['top_speed'])),
+                    'battery_capacity': int(decrypt_data(row['battery_capacity'])),
+                    'state_of_charge': int(decrypt_data(row['state_of_charge'])),
+                    'target_range_min': float(decrypt_data(row['target_range_min'])),
+                    'target_range_max': float(decrypt_data(row['target_range_max'])),
+                    'latitude': float(decrypt_data(row['latitude'])),
+                    'longitude': float(decrypt_data(row['longitude'])),
+                    'out_of_service': bool(row['out_of_service']),
+                    'mileage': float(decrypt_data(row['mileage'])),
+                    'last_maintenance_date': decrypt_data(row['last_maintenance_date']),
+                    'in_service_date': decrypt_data(row['in_service_date']),
+                    'search_index': row['search_index']  # Not encrypted
+                }
             return None
             
     except Exception as e:
         print(f"Error retrieving scooter: {str(e)}")
         return None
-
 
 def update_scooter(scooter_id, **kwargs):
     try:
@@ -566,9 +596,13 @@ def update_scooter(scooter_id, **kwargs):
         
         for field, value in kwargs.items():
             if field in valid_fields and value is not None:
+                if field != 'out_of_service':
+                    values.append(encrypt_data(str(value)))
+                else:
+                    values.append(value)
+ 
                 updates.append(f"{field} = ?")
-                values.append(value)
-        
+                
         if not updates:
             return False
             
@@ -597,10 +631,17 @@ def update_scooter(scooter_id, **kwargs):
                     suspicious=False
                 )
                 return True
+            
             return False
             
     except Exception as e:
         print(f"Error updating scooter: {str(e)}")
+        log_event(
+            username="system",
+            description="Error updating scooter data",
+            additional_info=f"Scooter ID: {scooter_id}, Error: {str(e)}",
+            suspicious=True
+        )
         return False
 
 
@@ -828,11 +869,25 @@ def use_restore_code(code, admin_username):
     global restore_codes
     
     if code not in restore_codes:
+        log_event(
+            username=admin_username,
+            description="Attempted to use invalid restore code",
+            additional_info=f"Code: {code}",
+            suspicious=True
+        )
         return False, "Invalid or expired restore code"
+    
     
     code_data = restore_codes[code]
     if code_data['admin_username'] != admin_username:
+        log_event(
+            username=admin_username,
+            description="Attempted to use restore code not issued for this admin",
+            additional_info=f"Code: {code}, Expected Admin: {code_data['admin_username']}",
+            suspicious=True
+        )
         return False, "Restore code not issued for this administrator"
+        
     
     backup_filename = code_data['backup_file']
     

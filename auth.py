@@ -230,11 +230,3 @@ def can_manage_scooters():
 
 def can_add_delete_scooters():
     return current_user["role"] in ["super_admin", "system_admin"]
-
-
-def get_role_hierarchy():
-    return {
-        "super_admin": "Super Administrator",
-        "system_admin": "System Administrator", 
-        "service_engineer": "Service Engineer"
-    } 

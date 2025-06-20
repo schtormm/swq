@@ -61,14 +61,6 @@ def is_valid_length(input_str, min_length=None, max_length=None):
     max_ok = max_length is None or length <= max_length
     return min_ok and max_ok
 
-
-def matches_whitelist_pattern(input_str, pattern):
-    return (input_str and 
-            isinstance(input_str, str) and 
-            is_safe_string(input_str) and 
-            re.fullmatch(pattern, input_str) is not None)
-
-
 def validate_username(username):
     if (username and 
         isinstance(username, str) and 
@@ -117,7 +109,7 @@ def validate_email(email):
         return False, "Email must be 5-100 characters in valid format with allowed characters only"
 
 
-def validate_mobile_phone(phone):
+def validate_phone_number(phone):
     if (phone and 
         isinstance(phone, str) and 
         is_safe_string(phone) and 
@@ -127,11 +119,11 @@ def validate_mobile_phone(phone):
         return False, "Mobile phone must be exactly 8 digits"
 
 
-def validate_zip_code(zip_code):
-    if (zip_code and 
-        isinstance(zip_code, str) and 
-        is_safe_string(zip_code) and 
-        re.fullmatch(ZIP_CODE_PATTERN, zip_code)):
+def validate_postcode(postcode):
+    if (postcode and 
+        isinstance(postcode, str) and 
+        is_safe_string(postcode) and 
+        re.fullmatch(ZIP_CODE_PATTERN, postcode)):
         return True, ""
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
