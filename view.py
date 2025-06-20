@@ -341,13 +341,3 @@ def update_own_password():
         print("\nPassword update cancelled.")
     except Exception as e:
         print(f"Error updating password: {str(e)}")
-
-
-def main_menu_wrapper():
-    try:
-        display_main_menu()
-    except KeyboardInterrupt:
-        print("\nReturning to main menu...")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        print("Returning to main menu...") 
