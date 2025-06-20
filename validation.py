@@ -235,23 +235,26 @@ def validate_percentage(value, field_name="Percentage"):
         return False, f"{field_name} must be a whole number between 0 and 100"
 
 
-def validate_gps_coordinates(latitude, longitude):
-    lat_valid = (latitude and 
-                isinstance(latitude, str) and 
-                is_safe_string(latitude) and 
-                re.fullmatch(GPS_COORDINATE_PATTERN, latitude) and 
-                validate_latitude(latitude))
-    
-    lng_valid = (longitude and 
-                isinstance(longitude, str) and 
-                is_safe_string(longitude) and 
-                re.fullmatch(GPS_COORDINATE_PATTERN, longitude) and 
-                validate_longitude(longitude))
-    
-    if lat_valid and lng_valid:
+def validate_latitude_single(latitude):
+    if (latitude and 
+        isinstance(latitude, str) and 
+        is_safe_string(latitude) and 
+        re.fullmatch(GPS_COORDINATE_PATTERN, latitude) and 
+        validate_latitude(latitude)):
         return True, ""
     else:
-        return False, "GPS coordinates must be in Rotterdam region with exactly 5 decimal places (lat: 51.80000-52.10000, lng: 4.20000-4.80000)"
+        return False, "Latitude must be in Rotterdam region with exactly 5 decimal places (51.80000-52.10000)"
+
+
+def validate_longitude_single(longitude):
+    if (longitude and 
+        isinstance(longitude, str) and 
+        is_safe_string(longitude) and 
+        re.fullmatch(GPS_COORDINATE_PATTERN, longitude) and 
+        validate_longitude(longitude)):
+        return True, ""
+    else:
+        return False, "Longitude must be in Rotterdam region with exactly 5 decimal places (4.20000-4.80000)"
 
 
 def validate_search_term(search_term):

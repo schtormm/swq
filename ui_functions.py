@@ -365,8 +365,8 @@ def add_scooter_ui():
         target_range_max = get_validated_input("Target Range Max (%): ", validate_percentage, "Target Range Max")
         
         print("GPS Coordinates (Rotterdam region, 5 decimal places):")
-        latitude = get_validated_input("Latitude (51.80000-52.10000): ", lambda x: validate_gps_coordinates(x, "4.50000")[0])
-        longitude = get_validated_input("Longitude (4.20000-4.80000): ", lambda x: validate_gps_coordinates("51.90000", x)[0])
+        latitude = get_validated_input("Latitude (51.80000-52.10000): ", validate_latitude_single)
+        longitude = get_validated_input("Longitude (4.20000-4.80000): ", validate_longitude_single)
         mileage = get_validated_input("Mileage (km): ", validate_positive_float, "Mileage", 0, 100000)
         last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ").strip()
         
@@ -476,7 +476,7 @@ def update_scooter_ui():
         
         new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ").strip()
         new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ").strip()
-        if new_lat and new_lng and validate_gps_coordinates(new_lat, new_lng)[0]:
+        if new_lat and new_lng and validate_latitude_single(new_lat) and validate_longitude_single(new_lng)[0]:
             updates['latitude'] = float(new_lat)
             updates['longitude'] = float(new_lng)
 
