@@ -17,7 +17,6 @@ def seed_default_users():
     print("Seeding default users...")
     
     try:
-        # Create system admin
         existing_system_admin = get_user_by_username("system_admin")
         if not existing_system_admin:
             create_user(
@@ -31,7 +30,6 @@ def seed_default_users():
         else:
             print("✓ System Administrator account already exists")
         
-        # Create service engineer
         existing_service_engineer = get_user_by_username("service_engineer")
         if not existing_service_engineer:
             create_user(
