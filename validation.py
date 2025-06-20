@@ -14,7 +14,7 @@ USERNAME_PATTERN = r'^[A-Za-z_][A-Za-z0-9_\'\.]{7,9}$'
 #email regex
 EMAIL_PATTERN = r'^[a-zA-Z0-9\._%+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}$'
 
-# 8 nummers voor telefoonnummer
+# 8 nummer voor telefoonnummer (format: +31-6-DDDDDDDD, alleen DDDDDDDD entered)
 PHONE_PATTERN = r'^[0-9]{8}$'
 
 # postcode regex (dus 1234AB oid)
@@ -47,6 +47,9 @@ PASSWORD_DIGITS = set('0123456789')
 PASSWORD_SPECIAL = set('~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 
 ALLOWED_GENDERS = {"male", "female"} 
+
+# Track consecutive validation failures per user session
+validation_failures = {}
 
 def is_safe_string(input_str):
     return input_str is not None and '\x00' not in str(input_str)
@@ -116,7 +119,7 @@ def validate_phone_number(phone):
         re.fullmatch(PHONE_PATTERN, phone)):
         return True, ""
     else:
-        return False, "Mobile phone must be exactly 8 digits"
+        return False, "Mobile phone must be exactly 8 digits (format: +31-6-DDDDDDDD, enter only DDDDDDDD)"
 
 
 def validate_postcode(postcode):
@@ -262,6 +265,63 @@ def validate_search_term(search_term):
         return False, "Search term must be 1-100 characters containing only letters, numbers, spaces, apostrophes, hyphens, dots, @ symbols"
 
 
+def detect_suspicious_input(user_input):
+    if not user_input or not isinstance(user_input, str):
+        return False
+    
+    input_lower = user_input.lower()
+    
+    # SQL injection patterns (relevant for SQLite)
+    sql_patterns = [
+        r"union\s+select",
+        r"drop\s+table",
+        r"delete\s+from", 
+        r"insert\s+into",
+        r"update\s+.*\s+set",
+        r"--|\/\*|\*\/",  # SQL comments
+        r"'.*or.*'.*=.*'",  # OR injection
+        r"'.*and.*'.*=.*'",  # AND injection
+        r";\s*(drop|delete|insert|update|create|alter)",
+        r"sqlite_master",  # SQLite system table
+        r"pragma\s+",  # SQLite pragma commands
+        r"attach\s+database",  # SQLite attach
+        r"load_extension"  # SQLite extensions
+    ]
+    
+    # Python code injection patterns (relevant for Python app)
+    code_patterns = [
+        r"eval\s*\(",  # Code evaluation
+        r"exec\s*\(",  # Code execution
+        r"import\s+",  # Import statements
+        r"__.*__",  # Python special methods
+        r"\x00",  # Null bytes
+    ]
+    
+    # File system patterns (relevant for any application)
+    file_patterns = [
+        r"\.\.\/",  # Directory traversal
+        r"\.\.\\",  # Windows directory traversal
+        r"\/etc\/",  # Unix system files
+        r"c:\\",  # Windows system paths
+    ]
+    
+    all_patterns = sql_patterns + code_patterns + file_patterns
+    
+    for pattern in all_patterns:
+        if re.search(pattern, input_lower, re.IGNORECASE):
+            return True
+    
+    # Check for excessive length (potential buffer overflow)
+    if len(user_input) > 1000:
+        return True
+    
+    # Check for multiple quote attempts (SQL injection indicator)
+    if user_input.count("'") > 3 or user_input.count('"') > 3:
+        return True
+    
+    return False
+
+
 def get_validated_input(prompt, validation_func, *args, **kwargs):
     while True:
         try:
@@ -269,8 +329,49 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
             is_valid, error_msg = validation_func(user_input, *args, **kwargs)
             
             if is_valid:
+                # reset falen count op succesvolle input
+                try:
+                    from auth import current_user
+                    username = current_user.get("username", "unknown") if current_user else "unknown"
+                    if username in validation_failures:
+                        del validation_failures[username]
+                except:
+                    pass
                 return user_input
             else:
+                # log failed validation attempt
+                try:
+                    from auth import current_user
+                    from database import log_event
+                    
+                    username = current_user.get("username", "unknown") if current_user else "unknown"
+                    
+                    if username not in validation_failures:
+                        validation_failures[username] = 0
+                    validation_failures[username] += 1
+                    
+                    is_suspicious = detect_suspicious_input(user_input)
+                    
+                    if validation_failures[username] >= 3:
+                        is_suspicious = True
+                    
+                    log_input = user_input[:100] + "..." if len(user_input) > 100 else user_input
+                    
+                    failure_info = f"Field prompt: '{prompt.strip()}', Invalid input: '{log_input}', Error: {error_msg}"
+                    if validation_failures[username] > 1:
+                        failure_info += f", Consecutive failures: {validation_failures[username]}"
+                    
+                    log_event(
+                        username=username,
+                        description="Invalid input validation failure",
+                        additional_info=failure_info,
+                        suspicious=is_suspicious
+                    )
+                    
+                except Exception as log_error:
+                    # incase de logging error geeft, catch de error en ga door
+                    pass
+                
                 print(f"{error_msg}")
                 
         except KeyboardInterrupt:
