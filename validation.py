@@ -21,7 +21,7 @@ PHONE_PATTERN = r'^[0-9]{8}$'
 ZIP_CODE_PATTERN = r'^[0-9]{4}[A-Z]{2}$'
 
 # regex voor rijbewijs
-DRIVING_LICENSE_PATTERN = r'^[A-Z][0-9]{6,7}$'
+DRIVING_LICENSE_PATTERN = r'^([A-Z]{2}[0-9]{7}|[A-Z][0-9]{8})$'
 
 # regex voor scooter serienummers
 SERIAL_NUMBER_PATTERN = r'^[A-Za-z0-9]{10,17}$'
@@ -171,7 +171,7 @@ def validate_driving_license(license_num):
         re.fullmatch(DRIVING_LICENSE_PATTERN, license_num)):
         return True, ""
     else:
-        return False, "Driving license must be 1 letter followed by 6-7 digits"
+        return False, "Driving license must be XXDDDDDDD (2 letters + 7 digits) or XDDDDDDDD (1 letter + 8 digits)"
 
 
 def validate_scooter_serial(serial):
