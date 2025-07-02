@@ -1,5 +1,5 @@
 # CRUD en zoek-stuff 
-from auth import current_user
+from auth import current_user, logout
 from database import *
 from utils import create_display_table, get_cities_list, print_sub_header
 from validation import *
@@ -669,6 +669,7 @@ def restore_backup_ui():
         if confirm == 'yes':
             if restore_backup(selected_backup['filename']):
                 print("System restored successfully!")
+                logout()
             else:
                 print("Failed to restore system.")
         else:
