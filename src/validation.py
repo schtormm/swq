@@ -66,7 +66,6 @@ def is_valid_length(input_str, min_length=None, max_length=None):
 
 def validate_username(username):
     if (username and 
-        isinstance(username, str) and 
         is_safe_string(username) and 
         is_valid_length(username, 8, 10) and 
         re.fullmatch(USERNAME_PATTERN, username)):
@@ -77,7 +76,6 @@ def validate_username(username):
 
 def validate_password(password):
     if (password and 
-        isinstance(password, str) and 
         is_safe_string(password) and 
         is_valid_length(password, 12, 30) and 
         all(c in PASSWORD_ALLOWED_CHARS for c in password) and
@@ -92,7 +90,6 @@ def validate_password(password):
 
 def validate_name(name, field_name="Name"):
     if (name and 
-        isinstance(name, str) and 
         is_safe_string(name) and 
         is_valid_length(name, 1, 50) and 
         re.fullmatch(NAME_PATTERN, name)):
@@ -103,7 +100,6 @@ def validate_name(name, field_name="Name"):
 
 def validate_email(email):
     if (email and 
-        isinstance(email, str) and 
         is_safe_string(email) and 
         is_valid_length(email, 5, 100) and 
         re.fullmatch(EMAIL_PATTERN, email)):
@@ -114,7 +110,6 @@ def validate_email(email):
 
 def validate_phone_number(phone):
     if (phone and 
-        isinstance(phone, str) and 
         is_safe_string(phone) and 
         re.fullmatch(PHONE_PATTERN, phone)):
         return True, ""
@@ -124,7 +119,6 @@ def validate_phone_number(phone):
 
 def validate_postcode(postcode):
     if (postcode and 
-        isinstance(postcode, str) and 
         is_safe_string(postcode) and 
         re.fullmatch(ZIP_CODE_PATTERN, postcode)):
         return True, ""
@@ -135,7 +129,6 @@ def validate_postcode(postcode):
 def validate_city(city):
     allowed_cities = set(get_cities_list())
     if (city and 
-        isinstance(city, str) and 
         is_safe_string(city) and 
         city in allowed_cities):
         return True, ""
@@ -145,7 +138,6 @@ def validate_city(city):
 
 def validate_gender(gender):
     if (gender and 
-        isinstance(gender, str) and 
         is_safe_string(gender) and 
         gender.lower() in ALLOWED_GENDERS):
         return True, ""
@@ -155,7 +147,6 @@ def validate_gender(gender):
 
 def validate_date(date_str, field_name="Date"):
     if (date_str and 
-        isinstance(date_str, str) and 
         is_safe_string(date_str) and 
         re.fullmatch(ISO_DATUM_PATTERN, date_str)):
         try:
@@ -169,7 +160,6 @@ def validate_date(date_str, field_name="Date"):
 
 def validate_driving_license(license_num):
     if (license_num and 
-        isinstance(license_num, str) and 
         is_safe_string(license_num) and 
         re.fullmatch(DRIVING_LICENSE_PATTERN, license_num)):
         return True, ""
@@ -179,7 +169,6 @@ def validate_driving_license(license_num):
 
 def validate_scooter_serial(serial):
     if (serial and 
-        isinstance(serial, str) and 
         is_safe_string(serial) and 
         re.fullmatch(SERIAL_NUMBER_PATTERN, serial)):
         return True, ""
@@ -189,7 +178,6 @@ def validate_scooter_serial(serial):
 
 def validate_positive_integer(value, field_name="Value", min_val=None, max_val=None):
     if (value and 
-        isinstance(value, str) and 
         is_safe_string(value) and 
         re.fullmatch(POSITIVE_INTEGER_PATTERN, value)):
         try:
@@ -208,7 +196,6 @@ def validate_positive_integer(value, field_name="Value", min_val=None, max_val=N
 
 def validate_positive_float(value, field_name="Value", min_val=None, max_val=None):
     if (value and 
-        isinstance(value, str) and 
         is_safe_string(value) and 
         re.fullmatch(POSITIVE_FLOAT_PATTERN, value)):
         try:
@@ -227,7 +214,6 @@ def validate_positive_float(value, field_name="Value", min_val=None, max_val=Non
 
 def validate_percentage(value, field_name="Percentage"):
     if (value and 
-        isinstance(value, str) and 
         is_safe_string(value) and 
         re.fullmatch(PERCENTAGE_PATTERN, value)):
         return True, ""
@@ -237,7 +223,6 @@ def validate_percentage(value, field_name="Percentage"):
 
 def validate_latitude_single(latitude):
     if (latitude and 
-        isinstance(latitude, str) and 
         is_safe_string(latitude) and 
         re.fullmatch(GPS_COORDINATE_PATTERN, latitude) and 
         validate_latitude(latitude)):
@@ -248,7 +233,6 @@ def validate_latitude_single(latitude):
 
 def validate_longitude_single(longitude):
     if (longitude and 
-        isinstance(longitude, str) and 
         is_safe_string(longitude) and 
         re.fullmatch(GPS_COORDINATE_PATTERN, longitude) and 
         validate_longitude(longitude)):
@@ -259,7 +243,6 @@ def validate_longitude_single(longitude):
 
 def validate_search_term(search_term):
     if (search_term and 
-        isinstance(search_term, str) and 
         is_safe_string(search_term) and 
         is_valid_length(search_term, 1, 100) and 
         re.fullmatch(SEARCH_PATTERN, search_term)):
@@ -269,9 +252,6 @@ def validate_search_term(search_term):
 
 
 def detect_suspicious_input(user_input):
-    if not user_input or not isinstance(user_input, str):
-        return False
-    
     input_lower = user_input.lower()
     
     # SQL injection patterns (relevant for SQLite)
@@ -386,7 +366,6 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
 def validate_choice(choice, valid_choices):
     allowed_choices = set(valid_choices)
     if (choice and 
-        isinstance(choice, str) and 
         is_safe_string(choice) and 
         choice in allowed_choices):
         return True, ""
