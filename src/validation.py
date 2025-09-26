@@ -328,7 +328,7 @@ def detect_suspicious_input(user_input):
 def get_validated_input(prompt, validation_func, *args, **kwargs):
     while True:
         try:
-            user_input = input(prompt).strip()
+            user_input = input(prompt)
             is_valid, error_msg = validation_func(user_input, *args, **kwargs)
             
             if is_valid:
