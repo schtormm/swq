@@ -97,6 +97,7 @@ def validate_name(name, field_name="Name"):
     if (name and 
         isinstance(name, str) and 
         is_safe_string(name) and 
+        not name[0].isspace() and not name[-1].isspace() and
         is_valid_length(name, 1, 50) and 
         re.fullmatch(NAME_PATTERN, name)):
         return True, ""
