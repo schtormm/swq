@@ -39,6 +39,9 @@ POSITIVE_FLOAT_PATTERN = r'^[0-9]+\.?[0-9]*$'
 
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
 
+# top speed regex
+SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
+
 # regexes voor in wachtwoord
 PASSWORD_ALLOWED_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 PASSWORD_LOWERCASE = set('abcdefghijklmnopqrstuvwxyz')
@@ -186,6 +189,14 @@ def validate_scooter_serial(serial):
     else:
         return False, "Serial number must be 10-17 alphanumeric characters"
 
+def validate_speed(speed_str):
+    if (speed_str and 
+        isinstance(speed_str, str) and 
+        is_safe_string(speed_str) and 
+        re.fullmatch(SPEED_PATTERN, speed_str)):
+        return True, ""
+    else:
+        return False, f"Max speed must be between 1 and 350 km/h"
 
 def validate_positive_integer(value, field_name="Value", min_val=None, max_val=None):
     if (value and 
@@ -342,7 +353,7 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
                     pass
                 return user_input
             else:
-                # log failed validation attempt
+                #loggen die zooi
                 try:
                     from auth import current_user
                     from database import log_event

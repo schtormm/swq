@@ -358,7 +358,7 @@ def add_scooter_ui():
         brand = get_validated_input("Brand: ", validate_name, "Brand")
         model = get_validated_input("Model: ", validate_name, "Model")
         serial_number = get_validated_input("Serial Number (10-17 alphanumeric): ", validate_scooter_serial)
-        top_speed = get_validated_input("Top Speed (km/h): ", validate_positive_integer, "Top Speed", 1, 200)
+        top_speed = get_validated_input("Top Speed (km/h): ", validate_speed, "Top Speed")
         battery_capacity = get_validated_input("Battery Capacity (Wh): ", validate_positive_integer, "Battery Capacity", 100, 10000)
         state_of_charge = get_validated_input("State of Charge (%): ", validate_percentage, "State of Charge")
         target_range_min = get_validated_input("Target Range Min (%): ", validate_percentage, "Target Range Min")
@@ -522,7 +522,7 @@ def update_scooter_ui():
                 updates['serial_number'] = new_serial
 
             new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ")()
-            if new_top_speed and validate_positive_integer(new_top_speed, "Top Speed")[0]:
+            if new_top_speed and validate_speed(new_top_speed, "Top Speed")[0]:
                 updates['top_speed'] = int(new_top_speed)
             
             new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ")()
