@@ -488,11 +488,13 @@ def update_scooter_ui():
         if new_target_range_max and validate_percentage(new_target_range_max)[0]:
             updates['target_range_max'] = int(new_target_range_max)
         
-        new_out_of_service = input(f"Out of Service (yes/no) [{scooter['out_of_service']}]: ")().lower()
-        if new_out_of_service in ['yes', 'no']:
-            updates['out_of_service'] = new_out_of_service == 'yes'
+        new_out_of_service = input(f"Out of Service (y/n) [{scooter['out_of_service']}]: ")()
+        if new_out_of_service in ['y', "Y",]:
+            updates['out_of_service'] = new_out_of_service == 'y'
+        elif new_out_of_service in ['n', 'N']:
+            updates['out_of_service'] = new_out_of_service == 'n'
         elif new_out_of_service:
-            print("Invalid input for Out of Service. Please enter 'yes' or 'no'.")
+            print("Invalid input for Out of Service. Please enter 'y' or 'n'.")
             return
         
         new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")()
