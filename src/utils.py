@@ -52,28 +52,6 @@ def generate_restore_code():
     return ''.join(random.choices(chars, k=16))
 
 
-def validate_latitude(latitude_str):
-    try:
-        lat = float(latitude_str)
-        # ongeveer binnen rotterdam
-        if 51.80000 <= lat <= 52.10000:
-            if len(latitude_str.split('.')[-1]) == 5:
-                return True
-    except:
-        pass
-    return False
-
-
-def validate_longitude(longitude_str):
-    try:
-        lng = float(longitude_str)
-        # ongeveer binnen rotterdam
-        if 4.20000 <= lng <= 4.80000:
-            if len(longitude_str.split('.')[-1]) == 5:
-                return True
-    except:
-        pass
-    return False
 
 
 def format_location(latitude, longitude):

@@ -2,7 +2,7 @@
 import re
 from datetime import date, datetime
 
-from utils import get_cities_list, validate_latitude, validate_longitude
+from utils import get_cities_list
 
 # whitelisting - wat mag er wel
 # naam regex
@@ -267,6 +267,29 @@ def validate_longitude_single(longitude):
         return True, ""
     else:
         return False, "Longitude must be in Rotterdam region with exactly 5 decimal places (4.20000-4.80000)"
+    
+def validate_latitude(latitude_str):
+    try:
+        lat = float(latitude_str)
+        # ongeveer binnen rotterdam
+        if 51.80000 <= lat <= 52.10000:
+            if len(latitude_str.split('.')[-1]) == 5:
+                return True
+    except:
+        pass
+    return False
+
+
+def validate_longitude(longitude_str):
+    try:
+        lng = float(longitude_str)
+        # ongeveer binnen rotterdam
+        if 4.20000 <= lng <= 4.80000:
+            if len(longitude_str.split('.')[-1]) == 5:
+                return True
+    except:
+        pass
+    return False
 
 
 def validate_search_term(search_term):
