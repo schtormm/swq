@@ -1,4 +1,5 @@
 # views voor menu's
+# @pablosanderman deze ook weghalen misschien? of daadwerkelijk gebruiken
 from auth import (can_access_logs, can_add_delete_scooters, can_backup_restore,
                   can_manage_role, can_manage_scooters, can_manage_travellers,
                   check_permission, current_user, has_role, logout,

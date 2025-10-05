@@ -474,6 +474,7 @@ def update_scooter_ui():
         if new_soc and validate_percentage(new_soc)[0]:
             updates['state_of_charge'] = int(new_soc)
         
+        # @schtormm misschien even naar kijken, zou massaging van input kunnen zijn
         new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ")()
         new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ")()
         if new_lat and new_lng and validate_latitude_single(new_lat) and validate_longitude_single(new_lng)[0]:
@@ -497,6 +498,7 @@ def update_scooter_ui():
             print("Invalid input for Out of Service. Please enter 'y' or 'n'.")
             return
         
+        # net zoals deze
         new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")()
         if new_mileage and validate_positive_float(new_mileage, "Mileage", 0, 100000)[0]:
             updates['mileage'] = float(new_mileage)

@@ -5,11 +5,10 @@ import os
 import sqlite3
 import zipfile
 from contextlib import closing
-from datetime import date, datetime
+from datetime import datetime
 
-from encryption import (decrypt_data, decrypt_log_data, encrypt_data,
-                        encrypt_log_data)
-from utils import format_datetime, generate_customer_id, generate_restore_code
+from encryption import decrypt_data, encrypt_data, encrypt_log_data
+from utils import generate_customer_id, generate_restore_code
 
 # config zooi
 DB_FILE = "urban_mobility.db"

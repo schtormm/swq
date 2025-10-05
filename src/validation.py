@@ -1,6 +1,6 @@
 # validatie, met whitelisting deze keer!!!
 import re
-from datetime import date, datetime
+from datetime import datetime
 
 from utils import get_cities_list
 
@@ -135,7 +135,7 @@ def validate_postcode(postcode):
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
 
-
+#@schtormm deze functie is niet echt logisch
 def validate_city(city):
     allowed_cities = set(get_cities_list())
     if (city and 
