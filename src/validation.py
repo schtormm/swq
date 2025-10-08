@@ -35,12 +35,16 @@ PERCENTAGE_PATTERN = r'^(100|[1-9]?[0-9])$'
 
 POSITIVE_INTEGER_PATTERN = r'^[1-9][0-9]*$'
 
-POSITIVE_FLOAT_PATTERN = r'^[0-9]+\.?[0-9]*$'
+MILEAGE_PATTERN = r'^(?:[0-9]+\.?[0-9]*|0)$'
 
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
 
 # top speed regex
-SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
+TOP_SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
+
+BATTERY_CAPACITY_PATTERN = r'^(?:1[5-9][0-9]|[2-9][0-9][0-9]|1[0-9][0-9][0-9]|2000)$'
+
+HOUSE_NUMBER_PATTERN = r'^[1-9][0-9]*$'
 
 # regexes voor in wachtwoord
 PASSWORD_ALLOWED_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
@@ -115,6 +119,7 @@ def validate_email(email):
 def validate_phone_number(phone):
     if (phone and 
         is_safe_string(phone) and 
+        is_valid_length(phone, 14, 14) and
         re.fullmatch(PHONE_PATTERN, phone)):
         return True, ""
     else:
@@ -138,6 +143,14 @@ def validate_city(city):
         return True, ""
     else:
         return False, f"City must be one of: {', '.join(sorted(allowed_cities))}"
+
+def validate_house_number(house_number):
+    if (house_number and 
+        is_safe_string(house_number) and 
+        re.fullmatch(HOUSE_NUMBER_PATTERN, house_number)):
+        return True, ""
+    else:
+        return False, "House number must be a positive integer without leading zeros"
 
 
 def validate_gender(gender):
@@ -183,45 +196,35 @@ def validate_speed(speed_str):
     if (speed_str and 
         isinstance(speed_str, str) and 
         is_safe_string(speed_str) and 
-        re.fullmatch(SPEED_PATTERN, speed_str)):
+        re.fullmatch(TOP_SPEED_PATTERN, speed_str)):
         return True, ""
     else:
         return False, f"Max speed must be between 1 and 350 km/h"
 
-def validate_positive_integer(value, field_name="Value", min_val=None, max_val=None):
+def validate_battery_capacity(battery_capacity):
+    if (battery_capacity and 
+        is_safe_string(battery_capacity) and 
+        re.fullmatch(BATTERY_CAPACITY_PATTERN, battery_capacity)):
+        return True, ""
+    else:
+        return False, "Battery capacity must be between 150 and 2000 Wh"
+
+
+def validate_mileage(mileage):
+    if (mileage and 
+        is_safe_string(mileage) and 
+        re.fullmatch(MILEAGE_PATTERN, mileage)):
+        return True, ""
+    else:
+        return False, "Mileage must be a positive number"
+
+def validate_positive_integer(value, field_name="Value"):
     if (value and 
         is_safe_string(value) and 
         re.fullmatch(POSITIVE_INTEGER_PATTERN, value)):
-        try:
-            int_val = int(value)
-            min_ok = min_val is None or int_val >= min_val
-            max_ok = max_val is None or int_val <= max_val
-            if min_ok and max_ok:
-                return True, ""
-            else:
-                return False, f"{field_name} must be between {min_val or 1} and {max_val or 'unlimited'}"
-        except ValueError:
-            return False, f"{field_name} must be a valid positive integer"
+        return True, ""
     else:
         return False, f"{field_name} must be a positive integer without leading zeros"
-
-
-def validate_positive_float(value, field_name="Value", min_val=None, max_val=None):
-    if (value and 
-        is_safe_string(value) and 
-        re.fullmatch(POSITIVE_FLOAT_PATTERN, value)):
-        try:
-            float_val = float(value)
-            min_ok = min_val is None or float_val >= min_val
-            max_ok = max_val is None or float_val <= max_val
-            if min_ok and max_ok:
-                return True, ""
-            else:
-                return False, f"{field_name} must be between {min_val or 0} and {max_val or 'unlimited'}"
-        except ValueError:
-            return False, f"{field_name} must be a valid positive number"
-    else:
-        return False, f"{field_name} must be a positive number"
 
 
 def validate_percentage(value, field_name="Percentage"):

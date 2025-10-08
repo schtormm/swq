@@ -179,7 +179,7 @@ def add_traveller_ui():
         birthday = get_validated_input("Birthday (YYYY-MM-DD): ", validate_date, "Birthday")
         gender = get_validated_input("Gender (male/female): ", validate_gender)
         street_name = get_validated_input("Street Name: ", validate_name, "Street Name")
-        house_number = get_validated_input("House Number: ", validate_positive_integer, "House Number", 1, 10000)
+        house_number = get_validated_input("House Number: ", validate_positive_integer, "House Number")
         zip_code = get_validated_input("Zip Code (DDDDXX): ", validate_postcode)
         
         cities = get_cities_list()
@@ -359,7 +359,7 @@ def add_scooter_ui():
         model = get_validated_input("Model: ", validate_name, "Model")
         serial_number = get_validated_input("Serial Number (10-17 alphanumeric): ", validate_scooter_serial)
         top_speed = get_validated_input("Top Speed (km/h): ", validate_speed, "Top Speed")
-        battery_capacity = get_validated_input("Battery Capacity (Wh): ", validate_positive_integer, "Battery Capacity", 100, 10000)
+        battery_capacity = get_validated_input("Battery Capacity (Wh): ", validate_battery_capacity)
         state_of_charge = get_validated_input("State of Charge (%): ", validate_percentage, "State of Charge")
         target_range_min = get_validated_input("Target Range Min (%): ", validate_percentage, "Target Range Min")
         target_range_max = get_validated_input("Target Range Max (%): ", validate_percentage, "Target Range Max")
@@ -367,7 +367,7 @@ def add_scooter_ui():
         print("GPS Coordinates (Rotterdam region, 5 decimal places):")
         latitude = get_validated_input("Latitude (51.80000-52.10000): ", validate_latitude_single)
         longitude = get_validated_input("Longitude (4.20000-4.80000): ", validate_longitude_single)
-        mileage = get_validated_input("Mileage (km): ", validate_positive_float, "Mileage", 0, 100000)
+        mileage = get_validated_input("Mileage (km): ", validate_mileage, "Mileage")
         last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ")()
         
         if last_maintenance and not validate_date(last_maintenance, "Last Maintenance Date")[0]:
@@ -500,7 +500,7 @@ def update_scooter_ui():
         
         # net zoals deze
         new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")()
-        if new_mileage and validate_positive_float(new_mileage, "Mileage", 0, 100000)[0]:
+        if new_mileage and validate_mileage(new_mileage)[0]:
             updates['mileage'] = new_mileage
         
         new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ")()
@@ -529,8 +529,8 @@ def update_scooter_ui():
             if new_top_speed and validate_speed(new_top_speed, "Top Speed")[0]:
                 updates['top_speed'] = new_top_speed
             
-            new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ")()
-            if new_battery_capacity and validate_positive_integer(new_battery_capacity, "Battery Capacity")[0]:
+            new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ")
+            if new_battery_capacity and validate_battery_capacity(new_battery_capacity)[0]:
                 updates['battery_capacity'] = new_battery_capacity
         else:
             print("You do not have permission to update brand, model, serial number, top speed, or battery capacity.")
