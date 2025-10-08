@@ -5,7 +5,8 @@ from datetime import datetime
 import bcrypt
 
 from database import create_user, get_user_by_username, log_event
-from utils import print_header, print_sub_header
+from utils import print_sub_header
+# @pablosanderman misschien weghalen? lijkt niet gebruikt en als het goed is gebeurt dit al voordat het hier terecht komt
 from validation import validate_password, validate_username
 
 current_user = {"username": None, "role": None, "user_id": None}

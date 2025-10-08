@@ -74,12 +74,12 @@ def update_user_ui(user_role):
         
         print("\nEnter new details (press Enter to keep current):")
         
-        new_first_name = input(f"First Name [{user['first_name']}]: ").strip()
+        new_first_name = input(f"First Name [{user['first_name']}]: ")()
         if new_first_name and not validate_name(new_first_name, "First Name")[0]:
             print("Invalid first name.")
             return
         
-        new_last_name = input(f"Last Name [{user['last_name']}]: ").strip()
+        new_last_name = input(f"Last Name [{user['last_name']}]: ")()
         if new_last_name and not validate_name(new_last_name, "Last Name")[0]:
             print("Invalid last name.")
             return
@@ -276,15 +276,15 @@ def update_traveller_ui():
         
         updates = {}
         
-        new_first_name = input(f"First Name [{traveller['first_name']}]: ").strip()
+        new_first_name = input(f"First Name [{traveller['first_name']}]: ")()
         if new_first_name and validate_name(new_first_name, "First Name")[0]:
             updates['first_name'] = new_first_name
         
-        new_last_name = input(f"Last Name [{traveller['last_name']}]: ").strip()
+        new_last_name = input(f"Last Name [{traveller['last_name']}]: ")()
         if new_last_name and validate_name(new_last_name, "Last Name")[0]:
             updates['last_name'] = new_last_name
         
-        new_email = input(f"Email [{traveller['email']}]: ").strip()
+        new_email = input(f"Email [{traveller['email']}]: ")()
         if new_email and validate_email(new_email)[0]:
             updates['email'] = new_email
         
@@ -358,7 +358,7 @@ def add_scooter_ui():
         brand = get_validated_input("Brand: ", validate_name, "Brand")
         model = get_validated_input("Model: ", validate_name, "Model")
         serial_number = get_validated_input("Serial Number (10-17 alphanumeric): ", validate_scooter_serial)
-        top_speed = get_validated_input("Top Speed (km/h): ", validate_positive_integer, "Top Speed", 1, 200)
+        top_speed = get_validated_input("Top Speed (km/h): ", validate_speed, "Top Speed")
         battery_capacity = get_validated_input("Battery Capacity (Wh): ", validate_positive_integer, "Battery Capacity", 100, 10000)
         state_of_charge = get_validated_input("State of Charge (%): ", validate_percentage, "State of Charge")
         target_range_min = get_validated_input("Target Range Min (%): ", validate_percentage, "Target Range Min")
@@ -368,7 +368,7 @@ def add_scooter_ui():
         latitude = get_validated_input("Latitude (51.80000-52.10000): ", validate_latitude_single)
         longitude = get_validated_input("Longitude (4.20000-4.80000): ", validate_longitude_single)
         mileage = get_validated_input("Mileage (km): ", validate_positive_float, "Mileage", 0, 100000)
-        last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ").strip()
+        last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ")()
         
         if last_maintenance and not validate_date(last_maintenance, "Last Maintenance Date")[0]:
             print("Invalid maintenance date format.")
@@ -470,36 +470,40 @@ def update_scooter_ui():
         
         updates = {}
         
-        new_soc = input(f"State of Charge % [{scooter['state_of_charge']}]: ").strip()
+        new_soc = input(f"State of Charge % [{scooter['state_of_charge']}]: ")()
         if new_soc and validate_percentage(new_soc)[0]:
             updates['state_of_charge'] = int(new_soc)
         
-        new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ").strip()
-        new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ").strip()
+        # @schtormm misschien even naar kijken, zou massaging van input kunnen zijn
+        new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ")()
+        new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ")()
         if new_lat and new_lng and validate_latitude_single(new_lat) and validate_longitude_single(new_lng)[0]:
             updates['latitude'] = float(new_lat)
             updates['longitude'] = float(new_lng)
 
-        new_target_range_min = input(f"Target Range Min % [{scooter['target_range_min']}]: ").strip()
+        new_target_range_min = input(f"Target Range Min % [{scooter['target_range_min']}]: ")()
         if new_target_range_min and validate_percentage(new_target_range_min)[0]:
             updates['target_range_min'] = int(new_target_range_min)
         
-        new_target_range_max = input(f"Target Range Max % [{scooter['target_range_max']}]: ").strip()
+        new_target_range_max = input(f"Target Range Max % [{scooter['target_range_max']}]: ")()
         if new_target_range_max and validate_percentage(new_target_range_max)[0]:
             updates['target_range_max'] = int(new_target_range_max)
         
-        new_out_of_service = input(f"Out of Service (yes/no) [{scooter['out_of_service']}]: ").strip().lower()
-        if new_out_of_service in ['yes', 'no']:
-            updates['out_of_service'] = new_out_of_service == 'yes'
+        new_out_of_service = input(f"Out of Service (y/n) [{scooter['out_of_service']}]: ")()
+        if new_out_of_service in ['y', "Y",]:
+            updates['out_of_service'] = new_out_of_service == 'y'
+        elif new_out_of_service in ['n', 'N']:
+            updates['out_of_service'] = new_out_of_service == 'n'
         elif new_out_of_service:
-            print("Invalid input for Out of Service. Please enter 'yes' or 'no'.")
+            print("Invalid input for Out of Service. Please enter 'y' or 'n'.")
             return
         
-        new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ").strip()
+        # net zoals deze
+        new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")()
         if new_mileage and validate_positive_float(new_mileage, "Mileage", 0, 100000)[0]:
             updates['mileage'] = float(new_mileage)
         
-        new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ").strip()
+        new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ")()
         if new_last_maintenance:
             if validate_date(new_last_maintenance, "Last Maintenance Date")[0]:
                 updates['last_maintenance_date'] = new_last_maintenance
@@ -509,23 +513,23 @@ def update_scooter_ui():
         
         # @pablosanderman volgens mij is hier nog extra validatie nodig dat de user ook echt de role heeft, is al functie voor maar wordt hier vgm niet gebruikt
         if current_user["role"] in ["super_admin", "system_admin"]: 
-            new_brand = input(f"Brand [{scooter['brand']}]: ").strip()
+            new_brand = input(f"Brand [{scooter['brand']}]: ")()
             if new_brand and validate_name(new_brand)[0]:
                 updates['brand'] = new_brand
                 
-            new_model = input(f"Model [{scooter['model']}]: ").strip()
+            new_model = input(f"Model [{scooter['model']}]: ")()
             if new_model and validate_name(new_model)[0]:
                 updates['model'] = new_model
 
-            new_serial = input(f"Serial Number [{scooter['serial_number']}]: ").strip()
+            new_serial = input(f"Serial Number [{scooter['serial_number']}]: ")()
             if new_serial and validate_scooter_serial(new_serial)[0]:
                 updates['serial_number'] = new_serial
 
-            new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ").strip()
-            if new_top_speed and validate_positive_integer(new_top_speed, "Top Speed")[0]:
+            new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ")()
+            if new_top_speed and validate_speed(new_top_speed, "Top Speed")[0]:
                 updates['top_speed'] = int(new_top_speed)
             
-            new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ").strip()
+            new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ")()
             if new_battery_capacity and validate_positive_integer(new_battery_capacity, "Battery Capacity")[0]:
                 updates['battery_capacity'] = int(new_battery_capacity)
         else:
@@ -788,7 +792,7 @@ def use_restore_code_ui():
     print_sub_header("Use Restore Code")
     
     try:
-        code = input("Enter restore code: ").strip().upper()
+        code = input("Enter restore code: ")().upper()
         
         if not code:
             print("Restore code cannot be empty.")
@@ -834,7 +838,7 @@ def view_logs_ui(suspicious_only=False):
         print(create_display_table(headers, rows))
         
         if logs:
-            choice = input("\nView details for a specific log entry? (Enter log number or press Enter to continue): ").strip()
+            choice = input("\nView details for a specific log entry? (Enter log number or press Enter to continue): ")()
             if choice and choice.isdigit():
                 log_num = int(choice)
                 selected_log = next((log for log in logs if log['log_number'] == log_num), None)

@@ -1,8 +1,8 @@
 # validatie, met whitelisting deze keer!!!
 import re
-from datetime import date, datetime
+from datetime import datetime
 
-from utils import get_cities_list, validate_latitude, validate_longitude
+from utils import get_cities_list
 
 # whitelisting - wat mag er wel
 # naam regex
@@ -38,6 +38,9 @@ POSITIVE_INTEGER_PATTERN = r'^[1-9][0-9]*$'
 POSITIVE_FLOAT_PATTERN = r'^[0-9]+\.?[0-9]*$'
 
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
+
+# top speed regex
+SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
 
 # regexes voor in wachtwoord
 PASSWORD_ALLOWED_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
@@ -91,6 +94,7 @@ def validate_password(password):
 def validate_name(name, field_name="Name"):
     if (name and 
         is_safe_string(name) and 
+        not name[0].isspace() and not name[-1].isspace() and
         is_valid_length(name, 1, 50) and 
         re.fullmatch(NAME_PATTERN, name)):
         return True, ""
@@ -125,7 +129,7 @@ def validate_postcode(postcode):
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
 
-
+#@schtormm deze functie is niet echt logisch
 def validate_city(city):
     allowed_cities = set(get_cities_list())
     if (city and 
@@ -175,6 +179,14 @@ def validate_scooter_serial(serial):
     else:
         return False, "Serial number must be 10-17 alphanumeric characters"
 
+def validate_speed(speed_str):
+    if (speed_str and 
+        isinstance(speed_str, str) and 
+        is_safe_string(speed_str) and 
+        re.fullmatch(SPEED_PATTERN, speed_str)):
+        return True, ""
+    else:
+        return False, f"Max speed must be between 1 and 350 km/h"
 
 def validate_positive_integer(value, field_name="Value", min_val=None, max_val=None):
     if (value and 
@@ -239,6 +251,29 @@ def validate_longitude_single(longitude):
         return True, ""
     else:
         return False, "Longitude must be in Rotterdam region with exactly 5 decimal places (4.20000-4.80000)"
+    
+def validate_latitude(latitude_str):
+    try:
+        lat = float(latitude_str)
+        # ongeveer binnen rotterdam
+        if 51.80000 <= lat <= 52.10000:
+            if len(latitude_str.split('.')[-1]) == 5:
+                return True
+    except:
+        pass
+    return False
+
+
+def validate_longitude(longitude_str):
+    try:
+        lng = float(longitude_str)
+        # ongeveer binnen rotterdam
+        if 4.20000 <= lng <= 4.80000:
+            if len(longitude_str.split('.')[-1]) == 5:
+                return True
+    except:
+        pass
+    return False
 
 
 def validate_search_term(search_term):
@@ -308,7 +343,7 @@ def detect_suspicious_input(user_input):
 def get_validated_input(prompt, validation_func, *args, **kwargs):
     while True:
         try:
-            user_input = input(prompt).strip()
+            user_input = input(prompt)
             is_valid, error_msg = validation_func(user_input, *args, **kwargs)
             
             if is_valid:
@@ -322,7 +357,7 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
                     pass
                 return user_input
             else:
-                # log failed validation attempt
+                #loggen die zooi
                 try:
                     from auth import current_user
                     from database import log_event

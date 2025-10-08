@@ -1,0 +1,12 @@
+# exclude _pycache_ directories and .pyc files
+__pycache__/
+*.pyc
+
+#exclude backups dir
+backups/
+
+um_encryption.key
+um_system.log
+urban_mobility.db
+.env
+.env.*.local
