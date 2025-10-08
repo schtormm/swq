@@ -348,7 +348,7 @@ def search_travellers(search_term):
                 first_name = decrypt_data(row['first_name'])
                 last_name = decrypt_data(row['last_name'])
                 email = decrypt_data(row['email'])
-                customer_id = str(row['customer_id'])
+                customer_id = row['customer_id']
                 if (search_lower in first_name.lower() or 
                     search_lower in last_name.lower() or 
                     search_lower in email.lower() or 
@@ -471,14 +471,14 @@ def create_scooter(scooter_data):
             'brand': encrypt_data(scooter_data['brand']),
             'model': encrypt_data(scooter_data['model']),
             'serial_number': encrypt_data(scooter_data['serial_number']),
-            'top_speed': encrypt_data(str(scooter_data['top_speed'])),
-            'battery_capacity': encrypt_data(str(scooter_data['battery_capacity'])),
-            'state_of_charge': encrypt_data(str(scooter_data['state_of_charge'])),
-            'target_range_min': encrypt_data(str(scooter_data['target_range_min'])),
-            'target_range_max': encrypt_data(str(scooter_data['target_range_max'])),
-            'latitude': encrypt_data(str(scooter_data['latitude'])),
-            'longitude': encrypt_data(str(scooter_data['longitude'])),
-            'mileage': encrypt_data(str(scooter_data.get('mileage', 0.0))),
+            'top_speed': encrypt_data(scooter_data['top_speed']),
+            'battery_capacity': encrypt_data(scooter_data['battery_capacity']),
+            'state_of_charge': encrypt_data(scooter_data['state_of_charge']),
+            'target_range_min': encrypt_data(scooter_data['target_range_min']),
+            'target_range_max': encrypt_data(scooter_data['target_range_max']),
+            'latitude': encrypt_data(scooter_data['latitude']),
+            'longitude': encrypt_data(scooter_data['longitude']),
+            'mileage': encrypt_data(scooter_data.get('mileage', 0.0)),
             'last_maintenance_date': encrypt_data(scooter_data.get('last_maintenance_date', ''))
         }
         
@@ -541,7 +541,7 @@ def search_scooters(search_term):
                         'brand': brand,
                         'model': model,
                         'serial_number': serial_number,
-                        'state_of_charge': int(decrypt_data(row['state_of_charge'])),
+                        'state_of_charge': decrypt_data(row['state_of_charge']),
                         'out_of_service': bool(row['out_of_service'])
                     })
             
@@ -565,15 +565,15 @@ def get_scooter_by_id(scooter_id):
                     'brand': decrypt_data(row['brand']),
                     'model': decrypt_data(row['model']), 
                     'serial_number': decrypt_data(row['serial_number']),
-                    'top_speed': float(decrypt_data(row['top_speed'])),
-                    'battery_capacity': int(decrypt_data(row['battery_capacity'])),
-                    'state_of_charge': int(decrypt_data(row['state_of_charge'])),
-                    'target_range_min': float(decrypt_data(row['target_range_min'])),
-                    'target_range_max': float(decrypt_data(row['target_range_max'])),
-                    'latitude': float(decrypt_data(row['latitude'])),
-                    'longitude': float(decrypt_data(row['longitude'])),
+                    'top_speed': decrypt_data(row['top_speed']),
+                    'battery_capacity': decrypt_data(row['battery_capacity']),
+                    'state_of_charge': decrypt_data(row['state_of_charge']),
+                    'target_range_min': decrypt_data(row['target_range_min']),
+                    'target_range_max': decrypt_data(row['target_range_max']),
+                    'latitude': decrypt_data(row['latitude']),
+                    'longitude': decrypt_data(row['longitude']),
                     'out_of_service': bool(row['out_of_service']),
-                    'mileage': float(decrypt_data(row['mileage'])),
+                    'mileage': decrypt_data(row['mileage']),
                     'last_maintenance_date': decrypt_data(row['last_maintenance_date']),
                     'in_service_date': decrypt_data(row['in_service_date'])
                 }
@@ -596,7 +596,7 @@ def update_scooter(scooter_id, **kwargs):
         for field, value in kwargs.items():
             if field in valid_fields and value is not None:
                 if field != 'out_of_service':
-                    values.append(encrypt_data(str(value)))
+                    values.append(encrypt_data(value))
                 else:
                     values.append(value)
  
@@ -679,7 +679,7 @@ def log_event(username, description, additional_info="", suspicious=False):
                                        additional_info, suspicious)
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (log_number, encrypted_date_time, encrypted_username, encrypted_description,
-                  encrypted_additional_info, int(suspicious)))
+                  encrypted_additional_info, suspicious))
             conn.commit()
             
         log_entry = {

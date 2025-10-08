@@ -55,14 +55,14 @@ ALLOWED_GENDERS = {"male", "female"}
 validation_failures = {}
 
 def is_safe_string(input_str):
-    return input_str is not None and '\x00' not in str(input_str)
+    return input_str is not None and '\x00' not in input_str
 
 
 def is_valid_length(input_str, min_length=None, max_length=None):
     if input_str is None:
         return min_length is None or min_length == 0
     
-    length = len(str(input_str))
+    length = len(input_str)
     min_ok = min_length is None or length >= min_length
     max_ok = max_length is None or length <= max_length
     return min_ok and max_ok
@@ -343,7 +343,8 @@ def detect_suspicious_input(user_input):
 def get_validated_input(prompt, validation_func, *args, **kwargs):
     while True:
         try:
-            user_input = input(prompt)
+            user_input = input(prompt) 
+            # isinstance(str), is not necessary because input() always returns a string
             is_valid, error_msg = validation_func(user_input, *args, **kwargs)
             
             if is_valid:

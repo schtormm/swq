@@ -230,7 +230,7 @@ def search_travellers_ui():
         
         for traveller in results:
             rows.append([
-                str(traveller['id']),
+                traveller['id'],
                 traveller['customer_id'],
                 f"{traveller['first_name']} {traveller['last_name']}",
                 traveller['email']
@@ -259,7 +259,7 @@ def update_traveller_ui():
         if len(results) > 1:
             print(f"Multiple travellers found. Please be more specific.")
             headers = ['ID', 'Customer ID', 'Name', 'Email']
-            rows = [[str(t['id']), t['customer_id'], f"{t['first_name']} {t['last_name']}", t['email']] for t in results]
+            rows = [[t['id'], t['customer_id'], f"{t['first_name']} {t['last_name']}", t['email']] for t in results]
             print(create_display_table(headers, rows))
             
             traveller_id = get_validated_input("Enter traveller ID to update: ", validate_positive_integer, "Traveller ID")
@@ -316,7 +316,7 @@ def delete_traveller_ui():
         if len(results) > 1:
             print("Multiple travellers found:")
             headers = ['ID', 'Customer ID', 'Name', 'Email']
-            rows = [[str(t['id']), t['customer_id'], f"{t['first_name']} {t['last_name']}", t['email']] for t in results]
+            rows = [[t['id'], t['customer_id'], f"{t['first_name']} {t['last_name']}", t['email']] for t in results]
             print(create_display_table(headers, rows))
             
             traveller_id = get_validated_input("Enter traveller ID to delete: ", validate_positive_integer, "Traveller ID")
@@ -378,14 +378,14 @@ def add_scooter_ui():
             'brand': brand,
             'model': model,
             'serial_number': serial_number,
-            'top_speed': int(top_speed),
-            'battery_capacity': int(battery_capacity),
-            'state_of_charge': int(state_of_charge),
-            'target_range_min': int(target_range_min),
-            'target_range_max': int(target_range_max),
-            'latitude': float(latitude),
-            'longitude': float(longitude),
-            'mileage': float(mileage),
+            'top_speed': top_speed,
+            'battery_capacity': battery_capacity,
+            'state_of_charge': state_of_charge,
+            'target_range_min': target_range_min,
+            'target_range_max': target_range_max,
+            'latitude': latitude,
+            'longitude': longitude,
+            'mileage': mileage,
             'last_maintenance_date': last_maintenance if last_maintenance else None
         }
         
@@ -418,7 +418,7 @@ def search_scooters_ui():
         for scooter in results:
             status = "Out of Service" if scooter['out_of_service'] else "In Service"
             rows.append([
-                str(scooter['id']),
+                scooter['id'],
                 scooter['brand'],
                 scooter['model'],
                 scooter['serial_number'],
@@ -449,7 +449,7 @@ def update_scooter_ui():
         if len(results) > 1:
             print("Multiple scooters found:")
             headers = ['ID', 'Brand', 'Model', 'Serial']
-            rows = [[str(s['id']), s['brand'], s['model'], s['serial_number']] for s in results]
+            rows = [[s['id'], s['brand'], s['model'], s['serial_number']] for s in results]
             print(create_display_table(headers, rows))
             
             scooter_id = get_validated_input("Enter scooter ID to update: ", validate_positive_integer, "Scooter ID")
@@ -472,22 +472,22 @@ def update_scooter_ui():
         
         new_soc = input(f"State of Charge % [{scooter['state_of_charge']}]: ")()
         if new_soc and validate_percentage(new_soc)[0]:
-            updates['state_of_charge'] = int(new_soc)
+            updates['state_of_charge'] = new_soc
         
         # @schtormm misschien even naar kijken, zou massaging van input kunnen zijn
         new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ")()
         new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ")()
         if new_lat and new_lng and validate_latitude_single(new_lat) and validate_longitude_single(new_lng)[0]:
-            updates['latitude'] = float(new_lat)
-            updates['longitude'] = float(new_lng)
+            updates['latitude'] = new_lat
+            updates['longitude'] = new_lng
 
         new_target_range_min = input(f"Target Range Min % [{scooter['target_range_min']}]: ")()
         if new_target_range_min and validate_percentage(new_target_range_min)[0]:
-            updates['target_range_min'] = int(new_target_range_min)
+            updates['target_range_min'] = new_target_range_min
         
         new_target_range_max = input(f"Target Range Max % [{scooter['target_range_max']}]: ")()
         if new_target_range_max and validate_percentage(new_target_range_max)[0]:
-            updates['target_range_max'] = int(new_target_range_max)
+            updates['target_range_max'] = new_target_range_max
         
         new_out_of_service = input(f"Out of Service (y/n) [{scooter['out_of_service']}]: ")()
         if new_out_of_service in ['y', "Y",]:
@@ -501,7 +501,7 @@ def update_scooter_ui():
         # net zoals deze
         new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")()
         if new_mileage and validate_positive_float(new_mileage, "Mileage", 0, 100000)[0]:
-            updates['mileage'] = float(new_mileage)
+            updates['mileage'] = new_mileage
         
         new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ")()
         if new_last_maintenance:
@@ -527,16 +527,16 @@ def update_scooter_ui():
 
             new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ")()
             if new_top_speed and validate_speed(new_top_speed, "Top Speed")[0]:
-                updates['top_speed'] = int(new_top_speed)
+                updates['top_speed'] = new_top_speed
             
             new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ")()
             if new_battery_capacity and validate_positive_integer(new_battery_capacity, "Battery Capacity")[0]:
-                updates['battery_capacity'] = int(new_battery_capacity)
+                updates['battery_capacity'] = new_battery_capacity
         else:
             print("You do not have permission to update brand, model, serial number, top speed, or battery capacity.")
             log_event(username=current_user["username"],
                       description=f"Attempted to update scooter {scooter['serial_number']} with ID {scooter['id']} without sufficient permissions.",
-                        additional_info=str(updates),
+                        additional_info=updates,
                         suspicious=True) 
         
         if updates:
@@ -544,14 +544,14 @@ def update_scooter_ui():
                 print("Scooter updated successfully!")
                 log_event(username=current_user["username"],
                           description=f"Updated scooter {scooter['serial_number']} with ID {scooter['id']}.",
-                          additional_info=str(updates),
+                          additional_info=updates,
                           suspicious=False)
             
             else:
                 print("Failed to update scooter.")
                 log_event(username=current_user["username"],
                           description=f"Failed to update scooter {scooter['serial_number']} with ID {scooter['id']}.",
-                          additional_info=str(updates),
+                          additional_info=updates,
                           suspicious=True)
         else:
             print("No changes made.")
@@ -576,7 +576,7 @@ def delete_scooter_ui():
         if len(results) > 1:
             print("Multiple scooters found:")
             headers = ['ID', 'Brand', 'Model', 'Serial']
-            rows = [[str(s['id']), s['brand'], s['model'], s['serial_number']] for s in results]
+            rows = [[s['id'], s['brand'], s['model'], s['serial_number']] for s in results]
             print(create_display_table(headers, rows))
             
             scooter_id = get_validated_input("Enter scooter ID to delete: ", validate_positive_integer, "Scooter ID")
@@ -640,7 +640,7 @@ def list_backups_ui():
         for backup in backups:
             rows.append([
                 backup['filename'],
-                str(backup['size']),
+                backup['size'],
                 backup['created'][:19].replace('T', ' ')
             ])
         
@@ -827,7 +827,7 @@ def view_logs_ui(suspicious_only=False):
         
         for log in logs:
             rows.append([
-                str(log['log_number']),
+                log['log_number'],
                 log['date_time'][:19].replace('T', ' '),
                 log['username'],
                 log['description'][:50] + ('...' if len(log['description']) > 50 else ''),
@@ -840,7 +840,7 @@ def view_logs_ui(suspicious_only=False):
         if logs:
             choice = input("\nView details for a specific log entry? (Enter log number or press Enter to continue): ")()
             if choice and choice.isdigit():
-                log_num = int(choice)
+                log_num = choice
                 selected_log = next((log for log in logs if log['log_number'] == log_num), None)
                 if selected_log:
                     print(f"\nLog Entry #{selected_log['log_number']}:")

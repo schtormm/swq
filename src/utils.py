@@ -67,7 +67,7 @@ def create_display_table(headers, rows):
         max_width = len(header)
         for row in rows:
             if i < len(row) and row[i] is not None:
-                max_width = max(max_width, len(str(row[i])))
+                max_width = max(max_width, len(row[i]))
         col_widths.append(min(max_width + 2, 30)) #karakter limiet = 30
     
     result = []
@@ -77,21 +77,13 @@ def create_display_table(headers, rows):
     
     for row in rows:
         row_line = "|".join(
-            f"{str(row[i]) if i < len(row) and row[i] is not None else '':^{col_widths[i]}}" 
+            f"{row[i] if i < len(row) and row[i] is not None else '':^{col_widths[i]}}" 
             for i in range(len(headers))
         )
         result.append(row_line)
     
     return "\n".join(result)
 
-
-def truncate_text(text, max_length=50):
-    if text is None:
-        return ""
-    text_str = str(text)
-    if len(text_str) <= max_length:
-        return text_str
-    return text_str[:max_length-3] + "..."
 
 def get_cities_list():
     return [
