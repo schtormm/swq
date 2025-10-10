@@ -51,13 +51,6 @@ def generate_restore_code():
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choices(chars, k=16))
 
-
-
-
-def format_location(latitude, longitude):
-    return f"{latitude:.5f}, {longitude:.5f}"
-
-
 def create_display_table(headers, rows):
     if not rows:
         return "No data to display"

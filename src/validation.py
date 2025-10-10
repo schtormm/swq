@@ -135,7 +135,7 @@ def validate_postcode(postcode):
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
 
-#@schtormm deze functie is niet echt logisch
+
 def validate_city(city):
     allowed_cities = set(get_cities_list())
     if (city and 
