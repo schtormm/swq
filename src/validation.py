@@ -35,12 +35,16 @@ PERCENTAGE_PATTERN = r'^(100|[1-9]?[0-9])$'
 
 POSITIVE_INTEGER_PATTERN = r'^[1-9][0-9]*$'
 
-POSITIVE_FLOAT_PATTERN = r'^[0-9]+\.?[0-9]*$'
+MILEAGE_PATTERN = r'^(?:[0-9]+\.?[0-9]*|0)$'
 
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
 
 # top speed regex
-SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
+TOP_SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
+
+BATTERY_CAPACITY_PATTERN = r'^(?:1[5-9][0-9]|[2-9][0-9][0-9]|1[0-9][0-9][0-9]|2000)$'
+
+HOUSE_NUMBER_PATTERN = r'^[1-9][0-9]*$'
 
 # regexes voor in wachtwoord
 PASSWORD_ALLOWED_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
@@ -55,21 +59,21 @@ ALLOWED_GENDERS = {"male", "female"}
 validation_failures = {}
 
 def is_safe_string(input_str):
-    return input_str is not None and '\x00' not in str(input_str)
+    return input_str is not None and '\x00' not in input_str
 
 
 def is_valid_length(input_str, min_length=None, max_length=None):
     if input_str is None:
         return min_length is None or min_length == 0
     
-    length = len(str(input_str))
+    length = len(input_str)
     min_ok = min_length is None or length >= min_length
     max_ok = max_length is None or length <= max_length
     return min_ok and max_ok
 
+# code checked: length en regex
 def validate_username(username):
     if (username and 
-        isinstance(username, str) and 
         is_safe_string(username) and 
         is_valid_length(username, 8, 10) and 
         re.fullmatch(USERNAME_PATTERN, username)):
@@ -78,9 +82,9 @@ def validate_username(username):
         return False, "Username must be 8-10 characters, start with letter/underscore, contain only letters, numbers, underscores, apostrophes, periods"
 
 
+# code checked: length en regex
 def validate_password(password):
     if (password and 
-        isinstance(password, str) and 
         is_safe_string(password) and 
         is_valid_length(password, 12, 30) and 
         all(c in PASSWORD_ALLOWED_CHARS for c in password) and
@@ -93,9 +97,9 @@ def validate_password(password):
         return False, "Password must be 12-30 characters with lowercase, uppercase, digit, and special character from allowed set"
 
 
+# code checked: length en regex en begin en eind met whitespace (want whitespace is toegestaan in regex)
 def validate_name(name, field_name="Name"):
     if (name and 
-        isinstance(name, str) and 
         is_safe_string(name) and 
         not name[0].isspace() and not name[-1].isspace() and
         is_valid_length(name, 1, 50) and 
@@ -105,9 +109,9 @@ def validate_name(name, field_name="Name"):
         return False, f"{field_name} must be 1-50 characters containing only letters, spaces, apostrophes, hyphens"
 
 
+# code checked: length en regex
 def validate_email(email):
     if (email and 
-        isinstance(email, str) and 
         is_safe_string(email) and 
         is_valid_length(email, 5, 100) and 
         re.fullmatch(EMAIL_PATTERN, email)):
@@ -116,51 +120,66 @@ def validate_email(email):
         return False, "Email must be 5-100 characters in valid format with allowed characters only"
 
 
+# code checked: length en regex
 def validate_phone_number(phone):
     if (phone and 
-        isinstance(phone, str) and 
         is_safe_string(phone) and 
+        is_valid_length(phone, 14, 14) and
         re.fullmatch(PHONE_PATTERN, phone)):
         return True, ""
     else:
         return False, "Mobile phone must be exactly 8 digits (format: +31-6-DDDDDDDD, enter only DDDDDDDD)"
 
 
+# code checked: length en regex
 def validate_postcode(postcode):
     if (postcode and 
-        isinstance(postcode, str) and 
         is_safe_string(postcode) and 
+        is_valid_length(postcode, 6, 6) and
         re.fullmatch(ZIP_CODE_PATTERN, postcode)):
         return True, ""
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
 
-
+#@schtormm deze functie is niet echt logisch
+# code checked: length en regex
 def validate_city(city):
     allowed_cities = set(get_cities_list())
     if (city and 
-        isinstance(city, str) and 
         is_safe_string(city) and 
+        is_valid_length(city, 1, 100) and
         city in allowed_cities):
         return True, ""
     else:
         return False, f"City must be one of: {', '.join(sorted(allowed_cities))}"
 
+# code checked: length en regex
+def validate_house_number(house_number):
+    if (house_number and 
+        is_safe_string(house_number) and 
+        is_valid_length(house_number, 1, 5) and 
+        re.fullmatch(HOUSE_NUMBER_PATTERN, house_number)):
+        return True, ""
+    else:
+        return False, "House number must be a positive integer without leading zeros"
 
+
+# code checked: length en regex
 def validate_gender(gender):
     if (gender and 
-        isinstance(gender, str) and 
         is_safe_string(gender) and 
+        is_valid_length(gender, 4, 6) and
         gender.lower() in ALLOWED_GENDERS):
         return True, ""
     else:
         return False, f"Gender must be one of: {', '.join(ALLOWED_GENDERS)}"
 
 
+# code checked: length en regex
 def validate_date(date_str, field_name="Date"):
     if (date_str and 
-        isinstance(date_str, str) and 
         is_safe_string(date_str) and 
+        is_valid_length(date_str, 10, 10) and
         re.fullmatch(ISO_DATUM_PATTERN, date_str)):
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
@@ -171,86 +190,86 @@ def validate_date(date_str, field_name="Date"):
         return False, f"{field_name} must be in YYYY-MM-DD format"
 
 
+# code checked: length en regex
 def validate_driving_license(license_num):
     if (license_num and 
-        isinstance(license_num, str) and 
         is_safe_string(license_num) and 
+        is_valid_length(license_num, 9, 9) and
         re.fullmatch(DRIVING_LICENSE_PATTERN, license_num)):
         return True, ""
     else:
         return False, "Driving license must be XXDDDDDDD (2 letters + 7 digits) or XDDDDDDDD (1 letter + 8 digits)"
 
 
+# code checked: length en regex
 def validate_scooter_serial(serial):
     if (serial and 
-        isinstance(serial, str) and 
         is_safe_string(serial) and 
+        is_valid_length(serial, 10, 17) and
         re.fullmatch(SERIAL_NUMBER_PATTERN, serial)):
         return True, ""
     else:
         return False, "Serial number must be 10-17 alphanumeric characters"
 
+# code checked: length en regex
 def validate_speed(speed_str):
     if (speed_str and 
         isinstance(speed_str, str) and 
         is_safe_string(speed_str) and 
-        re.fullmatch(SPEED_PATTERN, speed_str)):
+        is_valid_length(speed_str, 1, 3) and
+        re.fullmatch(TOP_SPEED_PATTERN, speed_str)):
         return True, ""
     else:
         return False, f"Max speed must be between 1 and 350 km/h"
 
-def validate_positive_integer(value, field_name="Value", min_val=None, max_val=None):
+# code checked: length en regex
+def validate_battery_capacity(battery_capacity):
+    if (battery_capacity and 
+        is_safe_string(battery_capacity) and 
+        is_valid_length(battery_capacity, 3, 4) and
+        re.fullmatch(BATTERY_CAPACITY_PATTERN, battery_capacity)):
+        return True, ""
+    else:
+        return False, "Battery capacity must be between 150 and 2000 Wh"
+
+
+# code checked: length en regex
+def validate_mileage(mileage):
+    if (mileage and 
+        is_safe_string(mileage) and 
+        is_valid_length(mileage, 1, 10) and
+        re.fullmatch(MILEAGE_PATTERN, mileage)):
+        return True, ""
+    else:
+        return False, "Mileage must be between 0 and 100000"
+
+# code checked: length en regex
+def validate_positive_integer(value, field_name="Value"):
     if (value and 
-        isinstance(value, str) and 
         is_safe_string(value) and 
+        is_valid_length(value, 1, 10) and
         re.fullmatch(POSITIVE_INTEGER_PATTERN, value)):
-        try:
-            int_val = int(value)
-            min_ok = min_val is None or int_val >= min_val
-            max_ok = max_val is None or int_val <= max_val
-            if min_ok and max_ok:
-                return True, ""
-            else:
-                return False, f"{field_name} must be between {min_val or 1} and {max_val or 'unlimited'}"
-        except ValueError:
-            return False, f"{field_name} must be a valid positive integer"
+        return True, ""
     else:
         return False, f"{field_name} must be a positive integer without leading zeros"
 
 
-def validate_positive_float(value, field_name="Value", min_val=None, max_val=None):
-    if (value and 
-        isinstance(value, str) and 
-        is_safe_string(value) and 
-        re.fullmatch(POSITIVE_FLOAT_PATTERN, value)):
-        try:
-            float_val = float(value)
-            min_ok = min_val is None or float_val >= min_val
-            max_ok = max_val is None or float_val <= max_val
-            if min_ok and max_ok:
-                return True, ""
-            else:
-                return False, f"{field_name} must be between {min_val or 0} and {max_val or 'unlimited'}"
-        except ValueError:
-            return False, f"{field_name} must be a valid positive number"
-    else:
-        return False, f"{field_name} must be a positive number"
-
-
+# code checked: length en regex
 def validate_percentage(value, field_name="Percentage"):
     if (value and 
-        isinstance(value, str) and 
         is_safe_string(value) and 
+        is_valid_length(value, 1, 3) and
         re.fullmatch(PERCENTAGE_PATTERN, value)):
         return True, ""
     else:
         return False, f"{field_name} must be a whole number between 0 and 100"
 
 
+# code checked: length en regex
 def validate_latitude_single(latitude):
     if (latitude and 
-        isinstance(latitude, str) and 
         is_safe_string(latitude) and 
+        is_valid_length(latitude, 1, 10) and
         re.fullmatch(GPS_COORDINATE_PATTERN, latitude) and 
         validate_latitude(latitude)):
         return True, ""
@@ -258,16 +277,18 @@ def validate_latitude_single(latitude):
         return False, "Latitude must be in Rotterdam region with exactly 5 decimal places (51.80000-52.10000)"
 
 
+# code checked: length en regex
 def validate_longitude_single(longitude):
     if (longitude and 
-        isinstance(longitude, str) and 
         is_safe_string(longitude) and 
+        is_valid_length(longitude, 1, 10) and
         re.fullmatch(GPS_COORDINATE_PATTERN, longitude) and 
         validate_longitude(longitude)):
         return True, ""
     else:
         return False, "Longitude must be in Rotterdam region with exactly 5 decimal places (4.20000-4.80000)"
     
+# code checked: length en regex
 def validate_latitude(latitude_str):
     try:
         lat = float(latitude_str)
@@ -280,6 +301,7 @@ def validate_latitude(latitude_str):
     return False
 
 
+# code checked: length en regex
 def validate_longitude(longitude_str):
     try:
         lng = float(longitude_str)
@@ -292,9 +314,9 @@ def validate_longitude(longitude_str):
     return False
 
 
+# code checked: length en regex
 def validate_search_term(search_term):
     if (search_term and 
-        isinstance(search_term, str) and 
         is_safe_string(search_term) and 
         is_valid_length(search_term, 1, 100) and 
         re.fullmatch(SEARCH_PATTERN, search_term)):
@@ -304,9 +326,6 @@ def validate_search_term(search_term):
 
 
 def detect_suspicious_input(user_input):
-    if not user_input or not isinstance(user_input, str):
-        return False
-    
     input_lower = user_input.lower()
     
     # SQL injection patterns (relevant for SQLite)
@@ -363,7 +382,8 @@ def detect_suspicious_input(user_input):
 def get_validated_input(prompt, validation_func, *args, **kwargs):
     while True:
         try:
-            user_input = input(prompt)
+            user_input = input(prompt) 
+            # isinstance(str), is not necessary because input() always returns a string
             is_valid, error_msg = validation_func(user_input, *args, **kwargs)
             
             if is_valid:
@@ -421,7 +441,6 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
 def validate_choice(choice, valid_choices):
     allowed_choices = set(valid_choices)
     if (choice and 
-        isinstance(choice, str) and 
         is_safe_string(choice) and 
         choice in allowed_choices):
         return True, ""

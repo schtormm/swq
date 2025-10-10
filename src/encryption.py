@@ -29,6 +29,7 @@ def encrypt_data(data):
     if data is None:
         return None
         
+    assert isinstance(data, str), "Data must be a string"
     data_str = str(data)
     
     encrypted_bytes = _cipher.encrypt(data_str.encode('utf-8'))
