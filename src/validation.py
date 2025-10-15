@@ -124,7 +124,7 @@ def validate_email(email):
 def validate_phone_number(phone):
     if (phone and 
         is_safe_string(phone) and 
-        is_valid_length(phone, 14, 14) and
+        is_valid_length(phone, 8, 8) and
         re.fullmatch(PHONE_PATTERN, phone)):
         return True, ""
     else:
@@ -141,17 +141,16 @@ def validate_postcode(postcode):
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
 
-#@schtormm deze functie is niet echt logisch
-# code checked: length en regex
-def validate_city(city):
-    allowed_cities = set(get_cities_list())
-    if (city and 
-        is_safe_string(city) and 
-        is_valid_length(city, 1, 100) and
-        city in allowed_cities):
+#@schtormm deze functie is niet echt logisch (dit was een comment op de validate_city functie, maar de functie is replaced met validate_choice)
+# validate if choice is in list of strings
+def validate_choice(choice, valid_choices, field_name="Choice"):
+    if (choice and 
+        is_safe_string(choice) and 
+        is_valid_length(choice, 1, 10000) and
+        choice in valid_choices):
         return True, ""
     else:
-        return False, f"City must be one of: {', '.join(sorted(allowed_cities))}"
+        return False, f"{field_name} must be one of: {', '.join(valid_choices)}"
 
 # code checked: length en regex
 def validate_house_number(house_number):
@@ -161,7 +160,7 @@ def validate_house_number(house_number):
         re.fullmatch(HOUSE_NUMBER_PATTERN, house_number)):
         return True, ""
     else:
-        return False, "House number must be a positive integer without leading zeros"
+        return False, "House number must be a positive integer without leading zeros, between 1 and 99999"
 
 
 # code checked: length en regex
@@ -237,7 +236,7 @@ def validate_battery_capacity(battery_capacity):
 def validate_mileage(mileage):
     if (mileage and 
         is_safe_string(mileage) and 
-        is_valid_length(mileage, 1, 10) and
+        is_valid_length(mileage, 1, 6) and
         re.fullmatch(MILEAGE_PATTERN, mileage)):
         return True, ""
     else:

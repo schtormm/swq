@@ -74,12 +74,12 @@ def update_user_ui(user_role):
         
         print("\nEnter new details (press Enter to keep current):")
         
-        new_first_name = input(f"First Name [{user['first_name']}]: ")()
+        new_first_name = input(f"First Name [{user['first_name']}]: ")
         if new_first_name and not validate_name(new_first_name, "First Name")[0]:
             print("Invalid first name.")
             return
         
-        new_last_name = input(f"Last Name [{user['last_name']}]: ")()
+        new_last_name = input(f"Last Name [{user['last_name']}]: ")
         if new_last_name and not validate_name(new_last_name, "Last Name")[0]:
             print("Invalid last name.")
             return
@@ -179,12 +179,12 @@ def add_traveller_ui():
         birthday = get_validated_input("Birthday (YYYY-MM-DD): ", validate_date, "Birthday")
         gender = get_validated_input("Gender (male/female): ", validate_gender)
         street_name = get_validated_input("Street Name: ", validate_name, "Street Name")
-        house_number = get_validated_input("House Number: ", validate_positive_integer, "House Number")
+        house_number = get_validated_input("House Number: ", validate_house_number)
         zip_code = get_validated_input("Zip Code (DDDDXX): ", validate_postcode)
         
         cities = get_cities_list()
         print(f"Available cities: {', '.join(sorted(cities))}")
-        city = get_validated_input("City: ", validate_city)
+        city = get_validated_input("City: ", validate_choice, cities, "City")
         
         email = get_validated_input("Email: ", validate_email)
         mobile_phone = get_validated_input("Mobile Phone (8 digits only): ", validate_phone_number)
@@ -276,15 +276,15 @@ def update_traveller_ui():
         
         updates = {}
         
-        new_first_name = input(f"First Name [{traveller['first_name']}]: ")()
+        new_first_name = input(f"First Name [{traveller['first_name']}]: ")
         if new_first_name and validate_name(new_first_name, "First Name")[0]:
             updates['first_name'] = new_first_name
         
-        new_last_name = input(f"Last Name [{traveller['last_name']}]: ")()
+        new_last_name = input(f"Last Name [{traveller['last_name']}]: ")
         if new_last_name and validate_name(new_last_name, "Last Name")[0]:
             updates['last_name'] = new_last_name
         
-        new_email = input(f"Email [{traveller['email']}]: ")()
+        new_email = input(f"Email [{traveller['email']}]: ")
         if new_email and validate_email(new_email)[0]:
             updates['email'] = new_email
         
@@ -358,7 +358,7 @@ def add_scooter_ui():
         brand = get_validated_input("Brand: ", validate_name, "Brand")
         model = get_validated_input("Model: ", validate_name, "Model")
         serial_number = get_validated_input("Serial Number (10-17 alphanumeric): ", validate_scooter_serial)
-        top_speed = get_validated_input("Top Speed (km/h): ", validate_speed, "Top Speed")
+        top_speed = get_validated_input("Top Speed (km/h): ", validate_speed)
         battery_capacity = get_validated_input("Battery Capacity (Wh): ", validate_battery_capacity)
         state_of_charge = get_validated_input("State of Charge (%): ", validate_percentage, "State of Charge")
         target_range_min = get_validated_input("Target Range Min (%): ", validate_percentage, "Target Range Min")
@@ -368,7 +368,7 @@ def add_scooter_ui():
         latitude = get_validated_input("Latitude (51.80000-52.10000): ", validate_latitude_single)
         longitude = get_validated_input("Longitude (4.20000-4.80000): ", validate_longitude_single)
         mileage = get_validated_input("Mileage (km): ", validate_mileage, "Mileage")
-        last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ")()
+        last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ")
         
         if last_maintenance and not validate_date(last_maintenance, "Last Maintenance Date")[0]:
             print("Invalid maintenance date format.")
@@ -470,26 +470,26 @@ def update_scooter_ui():
         
         updates = {}
         
-        new_soc = input(f"State of Charge % [{scooter['state_of_charge']}]: ")()
+        new_soc = input(f"State of Charge % [{scooter['state_of_charge']}]: ")
         if new_soc and validate_percentage(new_soc)[0]:
             updates['state_of_charge'] = new_soc
         
         # @schtormm misschien even naar kijken, zou massaging van input kunnen zijn
-        new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ")()
-        new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ")()
+        new_lat = input(f"Latitude [{scooter['latitude']:.5f}]: ")
+        new_lng = input(f"Longitude [{scooter['longitude']:.5f}]: ")
         if new_lat and new_lng and validate_latitude_single(new_lat) and validate_longitude_single(new_lng)[0]:
             updates['latitude'] = new_lat
             updates['longitude'] = new_lng
 
-        new_target_range_min = input(f"Target Range Min % [{scooter['target_range_min']}]: ")()
+        new_target_range_min = input(f"Target Range Min % [{scooter['target_range_min']}]: ")
         if new_target_range_min and validate_percentage(new_target_range_min)[0]:
             updates['target_range_min'] = new_target_range_min
         
-        new_target_range_max = input(f"Target Range Max % [{scooter['target_range_max']}]: ")()
+        new_target_range_max = input(f"Target Range Max % [{scooter['target_range_max']}]: ")
         if new_target_range_max and validate_percentage(new_target_range_max)[0]:
             updates['target_range_max'] = new_target_range_max
         
-        new_out_of_service = input(f"Out of Service (y/n) [{scooter['out_of_service']}]: ")()
+        new_out_of_service = input(f"Out of Service (y/n) [{scooter['out_of_service']}]: ")
         if new_out_of_service in ['y', "Y",]:
             updates['out_of_service'] = new_out_of_service == 'y'
         elif new_out_of_service in ['n', 'N']:
@@ -499,11 +499,11 @@ def update_scooter_ui():
             return
         
         # net zoals deze
-        new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")()
+        new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")
         if new_mileage and validate_mileage(new_mileage)[0]:
             updates['mileage'] = new_mileage
         
-        new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ")()
+        new_last_maintenance = input(f"Last Maintenance Date (YYYY-MM-DD) [{scooter['last_maintenance_date'] if scooter['last_maintenance_date'] else 'N/A'}]: ")
         if new_last_maintenance:
             if validate_date(new_last_maintenance, "Last Maintenance Date")[0]:
                 updates['last_maintenance_date'] = new_last_maintenance
@@ -513,20 +513,20 @@ def update_scooter_ui():
         
         # @pablosanderman volgens mij is hier nog extra validatie nodig dat de user ook echt de role heeft, is al functie voor maar wordt hier vgm niet gebruikt
         if current_user["role"] in ["super_admin", "system_admin"]: 
-            new_brand = input(f"Brand [{scooter['brand']}]: ")()
+            new_brand = input(f"Brand [{scooter['brand']}]: ")
             if new_brand and validate_name(new_brand)[0]:
                 updates['brand'] = new_brand
                 
-            new_model = input(f"Model [{scooter['model']}]: ")()
+            new_model = input(f"Model [{scooter['model']}]: ")
             if new_model and validate_name(new_model)[0]:
                 updates['model'] = new_model
 
-            new_serial = input(f"Serial Number [{scooter['serial_number']}]: ")()
+            new_serial = input(f"Serial Number [{scooter['serial_number']}]: ")
             if new_serial and validate_scooter_serial(new_serial)[0]:
                 updates['serial_number'] = new_serial
 
-            new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ")()
-            if new_top_speed and validate_speed(new_top_speed, "Top Speed")[0]:
+            new_top_speed = input(f"Top Speed (km/h) [{scooter['top_speed']}]: ")
+            if new_top_speed and validate_speed(new_top_speed)[0]:
                 updates['top_speed'] = new_top_speed
             
             new_battery_capacity = input(f"Battery Capacity (Wh) [{scooter['battery_capacity']}]: ")
@@ -640,7 +640,7 @@ def list_backups_ui():
         for backup in backups:
             rows.append([
                 backup['filename'],
-                backup['size'],
+                str(backup['size']), # ?
                 backup['created'][:19].replace('T', ' ')
             ])
         
@@ -660,12 +660,14 @@ def restore_backup_ui():
             print("No backups available.")
             return
         
+        backup_choices = []
         print("Available backups:")
-        for i, backup in enumerate(backups, 1):
+        for i, backup in enumerate(backups, 0):
             print(f"{i}. {backup['filename']} ({backup['created'][:19].replace('T', ' ')})")
-        
-        choice = get_validated_input(f"Select backup (1-{len(backups)}): ", validate_positive_integer, "Choice", 1, len(backups))
-        selected_backup = backups[int(choice) - 1]
+            backup_choices.append(str(i))
+
+        choice = get_validated_input(f"Select backup ({', '.join(backup_choices)}): ", validate_choice, backup_choices, "Backup")
+        selected_backup = backups[int(choice)] # input is validated, so cast is safe
         
         print(f"\nWarning: This will replace the current system with backup: {selected_backup['filename']}")
         confirm = input("Are you sure you want to continue? (yes/no): ").lower()
@@ -695,13 +697,14 @@ def generate_restore_code_ui():
         if not sys_admins:
             print("No System Administrators found.")
             return
-        
+        admin_choices = []
         print("System Administrators:")
-        for i, admin in enumerate(sys_admins, 1):
+        for i, admin in enumerate(sys_admins, 0):
             print(f"{i}. {admin['username']} ({admin['first_name']} {admin['last_name']})")
+            admin_choices.append(str(i))
         
-        admin_choice = get_validated_input(f"Select administrator (1-{len(sys_admins)}): ", validate_positive_integer, "Choice", 1, len(sys_admins))
-        selected_admin = sys_admins[int(admin_choice) - 1]
+        admin_choice = get_validated_input(f"Select administrator ({', '.join(admin_choices)}): ", validate_choice, admin_choices, "Administrator")
+        selected_admin = sys_admins[int(admin_choice)] # input is validated, so cast is safe
         
         backups = list_backups()
         if not backups:
@@ -709,11 +712,13 @@ def generate_restore_code_ui():
             return
         
         print("\nAvailable backups:")
-        for i, backup in enumerate(backups, 1):
+        backup_choices = []
+        for i, backup in enumerate(backups, 0):
             print(f"{i}. {backup['filename']} ({backup['created'][:19].replace('T', ' ')})")
+            backup_choices.append(str(i))
         
-        backup_choice = get_validated_input(f"Select backup (1-{len(backups)}): ", validate_positive_integer, "Choice", 1, len(backups))
-        selected_backup = backups[int(backup_choice) - 1]
+        backup_choice = get_validated_input(f"Select backup ({', '.join(backup_choices)}): ", validate_choice, backup_choices, "Backup")
+        selected_backup = backups[int(backup_choice)] # input is validated, so cast is safe
         
         code = generate_restore_code_for_admin(selected_admin['username'], selected_backup['filename'])
         
@@ -765,12 +770,15 @@ def revoke_restore_code_ui():
             print("No active restore codes to revoke.")
             return
         
+        code_choices = []
         print("Active restore codes:")
-        for i, code_info in enumerate(codes, 1):
+        for i, code_info in enumerate(codes, 0):
             print(f"{i}. {code_info['code']} (Admin: {code_info['admin_username']}, Backup: {code_info['backup_file']})")
-        
-        choice = get_validated_input(f"Select code to revoke (1-{len(codes)}): ", validate_positive_integer, "Choice", 1, len(codes))
-        selected_code = codes[int(choice) - 1]
+            code_choices.append(str(i))
+
+            
+        choice = get_validated_input(f"Select code to revoke ({', '.join(code_choices)}): ", validate_choice, code_choices, "Code")
+        selected_code = codes[int(choice)] # input is validated, so cast is safe
         
         confirm = input(f"Revoke code {selected_code['code']}? (yes/no): ").lower()
         
@@ -792,7 +800,7 @@ def use_restore_code_ui():
     print_sub_header("Use Restore Code")
     
     try:
-        code = input("Enter restore code: ")().upper()
+        code = input("Enter restore code: ")
         
         if not code:
             print("Restore code cannot be empty.")
@@ -839,7 +847,7 @@ def view_logs_ui(suspicious_only=False):
         print(create_display_table(headers, rows))
         
         if logs:
-            choice = input("\nView details for a specific log entry? (Enter log number or press Enter to continue): ")()
+            choice = input("\nView details for a specific log entry? (Enter log number or press Enter to continue): ")
             if choice and choice.isdigit():
                 log_num = choice
                 selected_log = next((log for log in logs if log['log_number'] == log_num), None)

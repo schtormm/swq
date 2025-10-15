@@ -37,7 +37,7 @@ def super_admin_menu():
         print("8. Logout")
         print_separator()
         
-        choice = input("Select option (1-8): ").strip()
+        choice = input("Select option (1-8): ")
         
         if choice == "1":
             manage_users_menu("system_admin")
@@ -76,7 +76,7 @@ def system_admin_menu():
         print("7. Logout")
         print_separator()
         
-        choice = input("Select option (1-7): ").strip()
+        choice = input("Select option (1-7): ")
         
         if choice == "1":
             update_own_password()
@@ -110,7 +110,7 @@ def service_engineer_menu():
         print("4. Logout")
         print_separator()
         
-        choice = input("Select option (1-4): ").strip()
+        choice = input("Select option (1-4): ")
         
         if choice == "1":
             update_own_password()
@@ -140,7 +140,7 @@ def manage_users_menu(user_role):
         print("6. Back to Main Menu")
         print_separator()
         
-        choice = input("Select option (1-6): ").strip()
+        choice = input("Select option (1-6): ")
         
         if choice == "1":
             list_users_ui(user_role)
@@ -171,7 +171,7 @@ def manage_travellers_menu():
         print("5. Back to Main Menu")
         print_separator()
         
-        choice = input("Select option (1-5): ").strip()
+        choice = input("Select option (1-5): ")
         
         if choice == "1":
             add_traveller_ui()
@@ -200,7 +200,7 @@ def manage_scooters_menu():
         print("5. Back to Main Menu")
         print_separator()
         
-        choice = input("Select option (1-5): ").strip()
+        choice = input("Select option (1-5): ")
         
         if choice == "1":
             if can_add_delete_scooters():
@@ -226,18 +226,17 @@ def manage_scooters_menu():
 
 
 def backup_restore_menu():
+    # i am going to fix this
     while True:
         print_header("Backup & Restore")
         print("1. Create Backup")
         print("2. List Backups")
         print("3. Restore from Backup")
-        if current_user["role"] == "system_admin":
-            print("4. Use Restore Code")
+        print("4. Use Restore Code")
         print("5. Back to Main Menu")
         print_separator()
         
-        max_choice = 5 if current_user["role"] == "super_admin" else 6
-        choice = input(f"Select option (1-{max_choice}): ").strip()
+        choice = input("Select option (1-5): ")
         
         if choice == "1":
             create_backup_ui()
@@ -248,8 +247,11 @@ def backup_restore_menu():
                 restore_backup_ui()
             else:
                 print("Access denied: System Administrators must use restore codes.")
-        elif choice == "4" and current_user["role"] == "system_admin":
-            use_restore_code_ui()
+        elif choice == "4":
+            if current_user["role"] == "system_admin":
+                use_restore_code_ui()
+            else:
+                print("Access denied: System Administrators must use restore codes.")
         elif choice == "5":
             break
         else:
@@ -260,10 +262,6 @@ def backup_restore_menu():
 
 
 def generate_restore_codes_menu():
-    if current_user["role"] != "super_admin":
-        print("Access denied: Only Super Administrator can generate restore codes.")
-        return
-        
     while True:
         print_header("Restore Code Management")
         print("1. Generate New Restore Code")
@@ -272,7 +270,7 @@ def generate_restore_codes_menu():
         print("4. Back to Main Menu")
         print_separator()
         
-        choice = input("Select option (1-4): ").strip()
+        choice = input("Select option (1-4): ")
         
         if choice == "1":
             generate_restore_code_ui()
@@ -297,7 +295,7 @@ def view_logs_menu():
         print("3. Back to Main Menu")
         print_separator()
         
-        choice = input("Select option (1-3): ").strip()
+        choice = input("Select option (1-3): ")
         
         if choice == "1":
             view_logs_ui(suspicious_only=False)
