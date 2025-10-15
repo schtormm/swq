@@ -802,6 +802,7 @@ def use_restore_code_ui():
         
         if success:
             print(f"{message}")
+            logout()
         else:
             print(f"{message}")
             

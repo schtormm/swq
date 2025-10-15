@@ -788,8 +788,6 @@ def restore_backup(backup_filename):
         if not os.path.exists(backup_path):
             raise FileNotFoundError("Backup file not found")
         
-        current_backup = create_backup()
-        
         # remove old database and log files
         if os.path.exists(DB_FILE):
             os.remove(DB_FILE)
@@ -808,7 +806,7 @@ def restore_backup(backup_filename):
         log_event(
             username="system", 
             description="System restored from backup",
-            additional_info=f"Backup file: {backup_filename}, Current backup: {current_backup}",
+            additional_info=f"Backup file: {backup_filename}",
             suspicious=False
         )
         
