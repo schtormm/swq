@@ -1,22 +1,22 @@
 # views voor menu's
 # @pablosanderman deze ook weghalen misschien? of daadwerkelijk gebruiken
-from auth import (can_access_logs, can_add_delete_scooters, can_backup_restore,
-                  can_manage_role, can_manage_scooters, can_manage_travellers,
-                  check_permission, current_user, has_role, logout,
-                  require_role)
+from auth import (
+    can_add_delete_scooters,
+    current_user,
+    logout,
+)
 from ui_functions import *
-from utils import (create_display_table, print_header, print_separator,
-                   print_sub_header)
+from utils import create_display_table, print_header, print_separator, print_sub_header
 
 
 def display_main_menu():
     match current_user["role"]:
         case "super_admin":
-                super_admin_menu()
+            super_admin_menu()
         case "system_admin":
-                system_admin_menu()
+            system_admin_menu()
         case "service_engineer":
-                service_engineer_menu()
+            service_engineer_menu()
         case default:
             print("Unknown role. Please contact administrator.")
             logout()
@@ -28,7 +28,7 @@ def super_admin_menu():
         print(f"Logged in as: {current_user['username']}")
         print_separator()
         print("1. Manage System Administrators")
-        print("2. Manage Service Engineers") 
+        print("2. Manage Service Engineers")
         print("3. Manage Travellers")
         print("4. Manage Scooters")
         print("5. Backup & Restore")
@@ -36,9 +36,9 @@ def super_admin_menu():
         print("7. View System Logs")
         print("8. Logout")
         print_separator()
-        
+
         choice = input("Select option (1-8): ")
-        
+
         if choice == "1":
             manage_users_menu("system_admin")
         elif choice == "2":
@@ -58,7 +58,7 @@ def super_admin_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         input("\nPress Enter to continue...")
 
 
@@ -70,14 +70,14 @@ def system_admin_menu():
         print("1. Update My Password")
         print("2. Manage Service Engineers")
         print("3. Manage Travellers")
-        print("4. Manage Scooters") 
+        print("4. Manage Scooters")
         print("5. Backup & Restore")
         print("6. View System Logs")
         print("7. Logout")
         print_separator()
-        
+
         choice = input("Select option (1-7): ")
-        
+
         if choice == "1":
             update_own_password()
         elif choice == "2":
@@ -95,7 +95,7 @@ def system_admin_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         input("\nPress Enter to continue...")
 
 
@@ -109,9 +109,9 @@ def service_engineer_menu():
         print("3. Search Scooters")
         print("4. Logout")
         print_separator()
-        
+
         choice = input("Select option (1-4): ")
-        
+
         if choice == "1":
             update_own_password()
         elif choice == "2":
@@ -123,13 +123,15 @@ def service_engineer_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         input("\nPress Enter to continue...")
 
 
 def manage_users_menu(user_role):
-    role_name = "System Administrator" if user_role == "system_admin" else "Service Engineer"
-    
+    role_name = (
+        "System Administrator" if user_role == "system_admin" else "Service Engineer"
+    )
+
     while True:
         print_header(f"Manage {role_name}s")
         print("1. List Users")
@@ -139,9 +141,9 @@ def manage_users_menu(user_role):
         print("5. Reset User Password")
         print("6. Back to Main Menu")
         print_separator()
-        
+
         choice = input("Select option (1-6): ")
-        
+
         if choice == "1":
             list_users_ui(user_role)
         elif choice == "2":
@@ -156,7 +158,7 @@ def manage_users_menu(user_role):
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         if choice != "6":
             input("\nPress Enter to continue...")
 
@@ -170,9 +172,9 @@ def manage_travellers_menu():
         print("4. Delete Traveller")
         print("5. Back to Main Menu")
         print_separator()
-        
+
         choice = input("Select option (1-5): ")
-        
+
         if choice == "1":
             add_traveller_ui()
         elif choice == "2":
@@ -185,7 +187,7 @@ def manage_travellers_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         if choice != "5":
             input("\nPress Enter to continue...")
 
@@ -199,9 +201,9 @@ def manage_scooters_menu():
         print("4. Delete Scooter")
         print("5. Back to Main Menu")
         print_separator()
-        
+
         choice = input("Select option (1-5): ")
-        
+
         if choice == "1":
             if can_add_delete_scooters():
                 add_scooter_ui()
@@ -220,7 +222,7 @@ def manage_scooters_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         if choice != "5":
             input("\nPress Enter to continue...")
 
@@ -235,9 +237,9 @@ def backup_restore_menu():
         print("4. Use Restore Code")
         print("5. Back to Main Menu")
         print_separator()
-        
+
         choice = input("Select option (1-5): ")
-        
+
         if choice == "1":
             create_backup_ui()
         elif choice == "2":
@@ -256,7 +258,7 @@ def backup_restore_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         if choice != "5":
             input("\nPress Enter to continue...")
 
@@ -269,9 +271,9 @@ def generate_restore_codes_menu():
         print("3. Revoke Restore Code")
         print("4. Back to Main Menu")
         print_separator()
-        
+
         choice = input("Select option (1-4): ")
-        
+
         if choice == "1":
             generate_restore_code_ui()
         elif choice == "2":
@@ -282,7 +284,7 @@ def generate_restore_codes_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         if choice != "4":
             input("\nPress Enter to continue...")
 
@@ -294,9 +296,9 @@ def view_logs_menu():
         print("2. View Suspicious Activities Only")
         print("3. Back to Main Menu")
         print_separator()
-        
+
         choice = input("Select option (1-3): ")
-        
+
         if choice == "1":
             view_logs_ui(suspicious_only=False)
         elif choice == "2":
@@ -305,34 +307,31 @@ def view_logs_menu():
             break
         else:
             print("Invalid option. Please try again.")
-        
+
         if choice != "3":
             input("\nPress Enter to continue...")
 
 
 def update_own_password():
     print_sub_header("Update Password")
-    
+
     try:
         from database import update_user_password
         from validation import get_validated_input, validate_password
 
-        new_password = get_validated_input(
-            "Enter new password: ",
-            validate_password
-        )
-        
+        new_password = get_validated_input("Enter new password: ", validate_password)
+
         confirm_password = input("Confirm new password: ")
-        
+
         if new_password != confirm_password:
             print("Passwords do not match.")
             return
-        
+
         if update_user_password(current_user["username"], new_password):
             print("Password updated successfully.")
         else:
             print("Failed to update password.")
-            
+
     except KeyboardInterrupt:
         print("\nPassword update cancelled.")
     except Exception as e:
