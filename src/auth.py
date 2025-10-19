@@ -79,7 +79,8 @@ def login():
     max_attempts = 3
     for attempt in range(max_attempts):
         try:
-            username = input("Username: ").strip().lower()
+            username = input("Username: ")
+
             if not username:
                 print("Username cannot be empty")
                 continue
@@ -100,6 +101,7 @@ def login():
                 continue
 
             user = get_user_by_username(username)
+
             if user and verify_password(password, user["password"]):
                 current_user["username"] = user["username"]
                 current_user["role"] = user["role"]
