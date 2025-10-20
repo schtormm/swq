@@ -6,6 +6,7 @@ import bcrypt
 
 from database import create_user, get_user_by_username, log_event
 from utils import print_sub_header
+from validation import detect_suspicious_input
 
 current_user = {"username": None, "role": None, "user_id": None}
 
@@ -84,6 +85,17 @@ def login():
             if not username:
                 print("Username cannot be empty")
                 continue
+
+            is_suspicious = detect_suspicious_input(username)
+
+            if is_suspicious:
+                print("Login attempt failed")
+                log_event(
+                    username="unknown",
+                    description="Suspicious input detected during login",
+                    additional_info=f"Input: {username}",
+                    suspicious=True,
+                )
 
             if not check_login_attempts(username):
                 print("Too many failed login attempts. Please try again later.")
