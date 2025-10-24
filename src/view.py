@@ -4,9 +4,11 @@ from auth import (
     can_add_delete_scooters,
     current_user,
     logout,
+    is_logged_in,
 )
 from ui_functions import *
 from utils import create_display_table, print_header, print_separator, print_sub_header
+
 
 
 def display_main_menu():
@@ -23,7 +25,7 @@ def display_main_menu():
 
 
 def super_admin_menu():
-    while True:
+    while is_logged_in():
         print_header("Super Administrator Menu")
         print(f"Logged in as: {current_user['username']}")
         print_separator()
@@ -63,7 +65,7 @@ def super_admin_menu():
 
 
 def system_admin_menu():
-    while True:
+    while is_logged_in():
         print_header("System Administrator Menu")
         print(f"Logged in as: {current_user['username']}")
         print_separator()
@@ -100,7 +102,7 @@ def system_admin_menu():
 
 
 def service_engineer_menu():
-    while True:
+    while is_logged_in():
         print_header("Service Engineer Menu")
         print(f"Logged in as: {current_user['username']}")
         print_separator()
@@ -132,7 +134,7 @@ def manage_users_menu(user_role):
         "System Administrator" if user_role == "system_admin" else "Service Engineer"
     )
 
-    while True:
+    while is_logged_in():
         print_header(f"Manage {role_name}s")
         print("1. List Users")
         print("2. Add New User")
@@ -164,7 +166,7 @@ def manage_users_menu(user_role):
 
 
 def manage_travellers_menu():
-    while True:
+    while is_logged_in():
         print_header("Manage Travellers")
         print("1. Add New Traveller")
         print("2. Search Travellers")
@@ -193,7 +195,7 @@ def manage_travellers_menu():
 
 
 def manage_scooters_menu():
-    while True:
+    while is_logged_in():
         print_header("Manage Scooters")
         print("1. Add New Scooter")
         print("2. Search Scooters")
@@ -229,7 +231,7 @@ def manage_scooters_menu():
 
 def backup_restore_menu():
     # i am going to fix this
-    while True:
+    while is_logged_in():
         print_header("Backup & Restore")
         print("1. Create Backup")
         print("2. List Backups")
@@ -264,7 +266,7 @@ def backup_restore_menu():
 
 
 def generate_restore_codes_menu():
-    while True:
+    while is_logged_in():
         print_header("Restore Code Management")
         print("1. Generate New Restore Code")
         print("2. List Active Restore Codes")
@@ -290,7 +292,7 @@ def generate_restore_codes_menu():
 
 
 def view_logs_menu():
-    while True:
+    while is_logged_in():
         print_header("System Logs")
         print("1. View Recent Logs")
         print("2. View Suspicious Activities Only")

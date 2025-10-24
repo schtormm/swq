@@ -441,12 +441,3 @@ def get_validated_input(prompt, validation_func, *args, **kwargs):
         except Exception as e:
             print(f"Input validation error: {str(e)}")
 
-
-def validate_choice(choice, valid_choices):
-    allowed_choices = set(valid_choices)
-    if (choice and 
-        is_safe_string(choice) and 
-        choice in allowed_choices):
-        return True, ""
-    else:
-        return False, f"Choice must be one of: {', '.join(valid_choices)}" 
