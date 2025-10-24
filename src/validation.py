@@ -31,22 +31,27 @@ SEARCH_PATTERN = r'^[A-Za-z0-9\s\'\-\.@]{1,100}$'
 
 ISO_DATUM_PATTERN = r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
 
+# percentage regex (0 to 100)
 PERCENTAGE_PATTERN = r'^(100|[1-9]?[0-9])$'
 
 POSITIVE_INTEGER_PATTERN = r'^[1-9][0-9]*$'
 
+# mileage regex (alleen positieve getallen, eventueel met decimalen)
 MILEAGE_PATTERN = r'^(?:[0-9]+\.?[0-9]*|0)$'
 
+# e.g. 51.92253
 GPS_COORDINATE_PATTERN = r'^[0-9]+\.[0-9]{5}$'
 
-# top speed regex
+# top speed regex (1 to 350 km/h)
 TOP_SPEED_PATTERN = r'^(?:[1-9][0-9]{0,1}|[1-2][0-9]{2}|3[0-4][0-9]|350)$'
 
+# 150 to 2000 Wh
 BATTERY_CAPACITY_PATTERN = r'^(?:1[5-9][0-9]|[2-9][0-9][0-9]|1[0-9][0-9][0-9]|2000)$'
 
+# house number regex (alleen positieve getallen, eventueel met decimalen)
 HOUSE_NUMBER_PATTERN = r'^[1-9][0-9]*$'
 
-# regexes voor in wachtwoord
+# regexes voor in wachtwoord (alles wat mag in een wachtwoord)
 PASSWORD_ALLOWED_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%&_-+=`|\\(){}[]:;\'<>,.?/')
 PASSWORD_LOWERCASE = set('abcdefghijklmnopqrstuvwxyz')
 PASSWORD_UPPERCASE = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
