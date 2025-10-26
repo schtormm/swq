@@ -433,7 +433,7 @@ def add_scooter_ui():
         longitude = get_validated_input(
             "Longitude (4.20000-4.80000): ", validate_longitude_single
         )
-        mileage = get_validated_input("Mileage (km): ", validate_mileage, "Mileage")
+        mileage = get_validated_input("Mileage (km): ", validate_mileage)
         last_maintenance = input("Last Maintenance Date (YYYY-MM-DD, optional): ")
 
         if (
@@ -594,7 +594,7 @@ def update_scooter_ui():
             print("Invalid input for Out of Service. Please enter 'y' or 'n'.")
             return
 
-        # net zoals deze
+    
         new_mileage = input(f"Mileage (km) [{scooter['mileage']:.2f}]: ")
         if new_mileage and validate_mileage(new_mileage)[0]:
             updates["mileage"] = new_mileage
@@ -609,7 +609,6 @@ def update_scooter_ui():
                 print("Invalid date format for Last Maintenance Date.")
                 return
 
-        # @pablosanderman volgens mij is hier nog extra validatie nodig dat de user ook echt de role heeft, is al functie voor maar wordt hier vgm niet gebruikt
         if current_user["role"] in ["super_admin", "system_admin"]:
             new_brand = input(f"Brand [{scooter['brand']}]: ")
             if new_brand and validate_name(new_brand)[0]:

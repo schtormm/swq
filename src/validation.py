@@ -146,7 +146,6 @@ def validate_postcode(postcode):
     else:
         return False, "Zip code must be exactly DDDDXX format (4 digits + 2 uppercase letters)"
 
-#@schtormm deze functie is niet echt logisch (dit was een comment op de validate_city functie, maar de functie is replaced met validate_choice)
 # validate if choice is in list of strings
 def validate_choice(choice, valid_choices, field_name="Choice"):
     if (choice and 

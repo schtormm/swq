@@ -1,14 +1,8 @@
 # views voor menu's
-# @pablosanderman deze ook weghalen misschien? of daadwerkelijk gebruiken
-from auth import (
-    can_add_delete_scooters,
-    current_user,
-    logout,
-    is_logged_in,
-)
+from auth import can_add_delete_scooters, current_user, is_logged_in, logout
 from ui_functions import *
-from utils import create_display_table, print_header, print_separator, print_sub_header
-
+from utils import (create_display_table, print_header, print_separator,
+                   print_sub_header)
 
 
 def display_main_menu():
